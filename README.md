@@ -1,9 +1,7 @@
 # The NovaSonica Bundle
-  
 This bundle is a selection of effects I've made over the years to make my own music production process easier. The tools can be roughly divided into three groups: EFX, Mixing Tools and Mastering Tools. All effects have a scalable user interface and most parameters can be automated. 
   
 ## What's In This?
-
 ### EFX
 #### Sonic Crow (ns_scr) v1.0.2  
 *Dedicated to a little crow that left the world too early.*  
@@ -43,7 +41,6 @@ This removes infrasound (< 20 Hz) and ultrasound (> 20 kHz) from your signal. Un
 In REAPER open the `Options` menu and select `Show REAPER resource path in explorer/finder...`. This will open the directory where your REAPER installation lives. Open the directory `Effects` and drop the effects in there. It is a good idea to keep them in directories like in the repo, so you can install different versions and use them side by side in case of changes that break backwards compatibility. 
 
 ## Technical Background (for my fellow nerds)
-  
 Because it became tedious work to make nice UIs for the effects (as there are **no** components like buttons or checkboxes or ...) I decided to design my own version of REAPER's JSFX language, simply called **JSFX-E**(xtended). I've added support for libraries and objects, project configuration via JSON files and a grid-based UI framework for UIs that can scale to any resolution without changes to the code or complex calculations.  
   
 Everything I've added to the language is designed to work well with the syntax highlighting of the [Sublime Text 3 plugin ReaSyntax](https://packagecontrol.io/packages/ReaSyntax) and code folding, some parts of it will look like standard JSFX and others may look weird at first sight, especially in the `@gfx` section.  
