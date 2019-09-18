@@ -1,0 +1,1669 @@
+desc:SonicSignalMeter v1.0.0 (NovaSonica)
+options:gmem=ns_debug
+in_pin:Left
+in_pin:Right
+out_pin:Left
+out_pin:Right
+filename:0,ns_ssm_ui_map.png
+slider1:359<0,359,1>-Hue
+
+/*||||||||||||||||||||||||||||||||||||||*/
+
+@init
+/*||||||||||||||||||||||||||||||||||||||*/
+GUI_RENDER_GRID_BACKGROUND = 1;
+GUI_RENDER_SUBGRID_BACKGROUND = 1;
+GUI_RENDER_FRAME = 1;
+GUI_RENDER_COMPONENTS = 1;
+GUI_RENDER_DEBUG_BORDERS = 0;
+THEME_COLORS_SHIFT_HOVER_HUE = 40;
+THEME_COLORS_SHIFT_FOREGROUND_HUE = 90;
+THEME_COLORS_SHIFT_LABEL_HUE = -70;
+THEME_COLORS_SHIFT_DISPLAY_HUE = -20;
+THEME_COLORS_MAIN_HUE = 268;
+THEME_COLORS_MAIN_SAT = 0.42;
+THEME_COLORS_MAIN_LUM = 0.24;
+THEME_COLORS_SUB_HUE = 269;
+THEME_COLORS_SUB_SAT = 0.38;
+THEME_COLORS_SUB_SAT_DIM = THEME_COLORS_SUB_SAT * 0.90;
+THEME_COLORS_SUB_LUM = 0.26;
+THEME_COLORS_SUB_LUM_DIM = THEME_COLORS_SUB_LUM * 0.90;
+THEME_COLORS_SUB_HUE_FG = THEME_COLORS_MAIN_HUE + THEME_COLORS_SHIFT_FOREGROUND_HUE;
+THEME_COLORS_SUB_HUE_HOVER = THEME_COLORS_SUB_HUE + THEME_COLORS_SHIFT_FOREGROUND_HUE;
+THEME_COLORS_SUB_HUE_LABEL = THEME_COLORS_SUB_HUE + THEME_COLORS_SHIFT_LABEL_HUE;
+THEME_COLORS_DISPLAY_HUE = THEME_COLORS_SUB_HUE + THEME_COLORS_SHIFT_DISPLAY_HUE;
+THEME_COLORS_DISPLAY_SAT = 0.5;
+THEME_COLORS_DISPLAY_LUM = 0.5;
+THEME_PADDING_MAIN_LEFT = 7;
+THEME_PADDING_MAIN_RIGHT = 7;
+THEME_PADDING_MAIN_TOP = 7;
+THEME_PADDING_MAIN_BOTTOM = 7;
+THEME_PADDING_SUB = 7;
+THEME_FRAME_LEFT = 6;
+THEME_FRAME_RIGHT = 6;
+THEME_FRAME_TOP = 6;
+THEME_FRAME_BOTTOM = 6;
+BUFFERS_MAX = 100;
+GFX_BUFFERS_MAX = 1000;
+GFX_BUFFER_SIZE = 11;
+UI_BUFFER_SIZE = 25;
+GONIOMETER_BUFFER_SIZE = 2048;
+UI_BUFFER_ADDR_BASE = 16384*10;
+UI_BUFFER_ADDR_MAIN = UI_BUFFER_ADDR_BASE;
+UI_BUFFER_ADDR_SUB = UI_BUFFER_ADDR_BASE + UI_BUFFER_SIZE;
+GFX_BUFFER_ADDR_BASE = UI_BUFFER_ADDR_BASE + UI_BUFFER_SIZE * 4;
+GFX_OFF_SCREEN_ADDR_BASE = GFX_BUFFER_ADDR_BASE + GFX_BUFFERS_MAX * GFX_BUFFER_SIZE;
+GONIOMETER_BUFFER_ADDR_BASE = GFX_OFF_SCREEN_ADDR_BASE + GFX_BUFFERS_MAX * GFX_BUFFER_SIZE;
+GONIOMETER_BUFFER_ADDR_X = GONIOMETER_BUFFER_ADDR_BASE;
+GONIOMETER_BUFFER_ADDR_Y = GONIOMETER_BUFFER_ADDR_X + GONIOMETER_BUFFER_SIZE * 2 + 2;
+BUFFER_ADDR_BASE = GONIOMETER_BUFFER_ADDR_Y + GONIOMETER_BUFFER_SIZE * 2 + 2;
+BUFFER_ADDR_HEADERS = BUFFER_ADDR_BASE;
+BUFFER_ADDR_ADDRESSES = BUFFER_ADDR_BASE + BUFFERS_MAX;
+BUFFER_ADDR_DATA = BUFFER_ADDR_BASE + BUFFERS_MAX * 2;
+
+function status()
+(
+	this.status_last = 0;
+	this.status_changed = 0;
+	this.samples_played = 0;
+);
+
+function status_is_playing()
+(
+	play_state == 1 || play_state == 5;
+);
+
+function status_update()
+(
+	this.status_changed = play_state != this.status_last;
+	this.status_changed ?
+	(
+		this.samples_played = 0;
+	) :
+	(
+		this.status_is_playing() ?
+		(
+			this.samples_played += 1;
+		);
+	);
+	this.status_last = play_state;
+);
+ST.status();
+PI = $pi;
+TWO_PI = $pi*2;
+FOUR_PI = $pi*4;
+TENTH_PI = $pi/10;
+COS_OF_ONE = cos(1);
+SIN_OF_ONE = sin(1);
+TWELFTH_ROOT_OF_TWO = 2^(1/12);
+TUNING = 440;
+phi = 1.6803398875;
+phi2 = 1.6803398875+1.6803398875;
+phi4 = phi2+phi2;
+half_pi = $pi/2;
+one_and_a_half_pi = $pi*1.5;
+pi2 = 2 * $pi;
+
+function logB(x b)
+(
+	log(x)/log(b);
+);
+
+function clamp(x xMin xMax)
+(
+	min(xMax,max(xMin,x));
+);
+
+function clampNorm(x)
+(
+	min(1,max(0,x));
+);
+
+function px2hzLog(px maxPx)
+(
+	0.00125 * exp(5.99396142730657 * px / maxPx) * srate - 0.00125 * srate;
+);
+
+function px2binLog(px fftsize maxPx)
+(
+	2 * (0.00125 * exp(5.99396142730657 * px / maxPx) * fftsize - 0.00125 * fftsize);
+);
+
+function hz2pxLog(hz maxPx)
+(
+	0.166834573783595 * log(800 * hz / srate + 1) * maxPx;
+);
+
+function hz2pxLin(hz maxPx)
+(
+	2.0 * hz * maxPx / srate;
+);
+
+function px2hzLin(px maxPx)
+(
+	0.5 * px * srate / maxPx;
+);
+
+function px2binLin(px fftsize maxPx)
+(
+	px * fftsize / maxPx;
+);
+
+function scaleValue(blin blog linLogRatio)
+(
+	blin - ((blin - blog) * (1 - linLogRatio));
+);
+
+function px2bin(px fftsize maxPx linLogRatio)
+(
+	scaleValue(px2binLin(px, fftsize, maxPx), px2binLog(px, fftsize, maxPx), linLogRatio);
+);
+
+function hz2px(hz maxPx linLogRatio)
+(
+	scaleValue(hz2pxLin(hz, maxPx), hz2pxLog(hz, maxPx), linLogRatio);
+);
+
+function px2hz(px maxPx linLogRatio)
+(
+	scaleValue(px2hzLin(px, maxPx), px2hzLog(px, maxPx), linLogRatio);
+);
+
+function hz2semitones(hz)
+(
+	-logB(TUNING, TWELFTH_ROOT_OF_TWO) + logB(hz, TWELFTH_ROOT_OF_TWO);
+);
+
+function hz2keyName(hz)
+local(semitones octaveFloat octave keyFloat key centsFloat cents keyName str)
+(
+	semitones = hz2semitones(hz);
+	octaveFloat = semitones/12+4;
+	octave = floor(octaveFloat);
+	keyFloat = (octaveFloat-octave)*12;
+	key = floor(keyFloat);
+	centsFloat = (keyFloat-key)*100;
+	cents = floor(centsFloat);
+	(key >= 3) ? octave += 1;
+	keyName = #;
+	keyName = (key == 0) ? "A" :
+	((key == 1) ? "A#" :
+	((key == 2) ? "B" :
+	((key == 3) ? "C" :
+	((key == 4) ? "C#" :
+	((key == 5) ? "D" :
+	((key == 6) ? "D#" :
+	((key == 7) ? "E" :
+	((key == 8) ? "F" :
+	((key == 9) ? "F#" :
+	((key == 10) ? "G" :
+	((key == 11) ? "G#" : "-")))))))))));
+	str = #;
+	sprintf(str, "%s%d+%03d", keyName, octave, cents);
+	sprintf(str, "%8s", str);
+	str;
+);
+
+function getPartial(f n)
+(
+	n * f;
+);
+
+function fmod(x y)
+local(xy)
+(
+	xy = x/y;
+	abs(floor(xy) - xy)*2;
+);
+
+function round(val)
+(
+	floor(val + 0.5);
+);
+
+function round(val stepsize)
+(
+	round(val/stepsize)*stepsize;
+);
+
+function snapNormalizedToEdge(val snapDistance)
+local(minSnap maxSnap)
+(
+	minSnap = snapDistance;
+	maxSnap = 1 - snapDistance;
+	val <= minSnap ? ( val = 0; );
+	val >= maxSnap ? ( val = 1; );
+	val;
+);
+
+function snapXToPixels(x)
+(
+	x|0 + snapNormalizedToEdge(x-floor(x), 0.02);
+);
+
+function snapYToPixels(y)
+(
+	y|0 + snapNormalizedToEdge(y-floor(y), 0.02);
+);
+
+function snapWidthToPixels(w)
+(
+	w|0 + snapNormalizedToEdge(w-floor(w), 0.02);
+);
+
+function snapHeightToPixels(h)
+(
+	h|0 + snapNormalizedToEdge(h-floor(h), 0.02) + 1;
+);
+
+function str_concat(str_a str_b)
+local(fmt str)
+(
+	fmt = "%s%s";
+	str = #;
+	sprintf(str, fmt, str_a, str_b);
+	str;
+);
+
+function goniometer()
+(
+	this.xPos = GONIOMETER_BUFFER_ADDR_X;
+	this.yPos = GONIOMETER_BUFFER_ADDR_Y;
+	this.rot = -$pi/4;
+	this.samples = GONIOMETER_BUFFER_SIZE;
+	this.refresh_rate = srate/8;
+	this.n = 0;
+	this.phC = 0;
+	this.ph = 0;
+);
+
+function goniometer_normalize_samples()
+(
+	this.i = min(this.b, this.samples);
+	this.spl_min = 0;
+	this.spl_max = 0;
+	loop (this.i,
+		this.spl_x = this.xPos[this.i];
+		this.spl_y = this.yPos[this.i];
+		this.spl_min = min(this.spl_min, min(this.spl_x, this.spl_y));
+		this.spl_max = max(this.spl_max, max(this.spl_x, this.spl_y));
+		this.i -= 1;
+	);
+	this.spl_normalized = max(abs(this.spl_min), this.spl_max)*2;
+);
+
+function goniometer_sample()
+(
+	this.spl_0 = sign(spl0);
+	this.spl_1 = sign(spl1);
+	this.angle = atan(spl0/spl1);
+	this.a = abs(this.angle);
+	this.in_phase = this.a >= 1.570796 ? 1 : (this.a <= 0.0001 ? 0 : -1);
+	(
+		(this.spl_0 == 1 && this.spl_1 == -1) ||
+		(this.spl_0 == -1 && this.spl_1 == -1)
+	) ?
+	(
+		this.angle += $pi;
+	);
+	(this.spl_0 == -1 && this.spl_1 == 1) ?
+	(
+		this.angle += $pi*2;
+	);
+	(spl1 == 0) ? ((spl0 > 0) ? ( this.angle = $pi/2; ) : ( this.angle = $pi*1.5; ); );
+	(spl0 == 0) ? ((spl1 > 0) ? ( this.angle = 0; ) : ( this.angle = $pi; ); );
+	this.radius = sqrt(sqr(spl0)+sqr(spl1));
+	this.angle -= this.rot;
+	this.xPos[this.b] = cos(this.angle)*this.radius;
+	this.yPos[this.b] = sin(this.angle)*this.radius;
+	(this.b < this.samples) ? ( this.b += 1; );
+	(this.spl_0 != this.spl_1) ? ( this.phC -= 1; ) : ( this.phC += 1; );
+	this.n += 1;
+	(this.n > this.refresh_rate) ?
+	(
+		this.correlation = this.phC / this.n;
+		this.ph = (1-this.correlation)/2;
+		this.phC = this.n = 0;
+	);
+);
+
+function goniometer_x(i)
+(
+	this.xPos[i];
+);
+
+function goniometer_y(i)
+(
+	this.yPos[i];
+);
+GM.goniometer();
+
+function mouseInArea(x y w h)
+(
+	mouse_y >= y && mouse_y <= (y+h) && (mouse_x >= x && mouse_x <= (x+w));
+);
+
+function hsla(h s l a)
+local(m c x r g b quadrant)
+(
+	h < 0 ?
+	(
+		h = h + ceil(-h / 360) * 360;
+	) :
+	(
+		h > 360 ?
+		(
+			h = h - floor(h / 360) * 360;
+		);
+	);
+	h == 0 ? h = 360;
+	m = l - (c / 2);
+	c = (1 - abs(2 * s - 1)) * s;
+	x = c * (1 - abs(fmod((h / 60), 2) - 1));
+	r = 0; g = 0; b = 0;
+	quadrant = ceil(h / 60);
+	quadrant == 1 ? ( r = c; g = x; b = 0; );
+	quadrant == 2 ? ( r = x; g = c; b = 0; );
+	quadrant == 3 ? ( r = 0; g = c; b = x; );
+	quadrant == 4 ? ( r = 0; g = x; b = c; );
+	quadrant == 5 ? ( r = x; g = 0; b = c; );
+	quadrant == 6 ? ( r = c; g = 0; b = x; );
+	gfx_r = r + m;
+	gfx_g = g + m;
+	gfx_b = b + m;
+	gfx_a = a;
+);
+
+function blurArea(x y w h n)
+(
+	loop(n,
+		gfx_x = x;
+		gfx_y = y;
+		gfx_blurto(gfx_x+w, gfx_y+h);
+	);
+);
+
+function drawString(x y str)
+(
+	gfx_x = x;
+	gfx_y = y;
+	gfx_drawstr(str);
+);
+
+function drawStringOutlined(x y str hue sat lum a)
+(
+	hsla(hue,0,0.01,a/2);
+	drawString(x-1, y, str);
+	drawString(x+1, y, str);
+	drawString(x, y-1, str);
+	drawString(x, y+1, str);
+	drawString(x-1, y-1, str);
+	drawString(x+1, y-1, str);
+	drawString(x-1, y+1, str);
+	drawString(x+1, y+1, str);
+	hsla(hue,sat,lum,a);
+	drawString(x, y, str);
+);
+
+function drawStringOutlined(x y str)
+(
+	drawStringOutlined(x, y, str, 0, 1, 1, 1);
+);
+
+function showToolTip(x y w h str)
+local(strW strH bx by bw bh)
+(
+	mouse_y >= y && mouse_y <= (y+h) && (mouse_x >= x && mouse_x <= (x+w)) ?
+	(
+		strW = 0;
+		strH = 0;
+		gfx_measurestr(str, strW, strH);
+		bx = mouse_x + 10;
+		by = mouse_y - strH - 15;
+		bw = strW + 5;
+		bh = strH + 5;
+		bx < x ? bx = x;
+		by < y ? by = y;
+		bx + bw >= x+w ? bx = x+w-bw;
+		by + bh >= y+h ? by = y+h-bh;
+		blurArea(bx, by, bw, bh, 16);
+		gfx_r = 0; gfx_g = 0; gfx_b = 0; gfx_a = 0.5;
+		gfx_rect(bx, by, bw, bh);
+		gfx_r = 1; gfx_g = 1; gfx_b = 1; gfx_a = 1;
+		gfx_rect(bx-1, by-1, bw+2, bh+2, -1);
+		drawString(bx+2.5, by+2.5, str);
+	);
+);
+
+function gfx_start(bufID)
+local(gfx_last_buffer)
+(
+	gfx_last_buffer = gfx_dest;
+	gfx_dest = bufID;
+	gfx_w_local = 0;
+	gfx_h_local = 0;
+	gfx_getimgdim(bufID, gfx_w_local, gfx_h_local);
+);
+
+function gfx_end()
+(
+	gfx_dest = gfx_last_buffer;
+);
+
+function blit_prepare_display(hue sat lum alpha)
+local(last_h last_s last_l last_a)
+(
+	last_h != hue || last_s != sat || last_l != lum || last_a != alpha ?
+	(
+		gfx_dest = 50;
+		gfx_setimgdim(50, 2, 2);
+		gfx_r = gfx_g = gfx_b = 0; gfx_a = 1;
+		gfx_rect(0, 0, 2, 2);
+		hsla(hue, sat, lum, alpha);
+		gfx_x = 0; gfx_y = 0;
+		gfx_setpixel(gfx_r, gfx_g, gfx_b);
+		hsla(hue, sat, lum*0.5, alpha);
+		gfx_x = 1; gfx_y = 1;
+		gfx_setpixel(gfx_r, gfx_g, gfx_b);
+		hsla(hue, sat, lum*(2/3), alpha);
+		gfx_x = 1; gfx_y = 0;
+		gfx_setpixel(gfx_r, gfx_g, gfx_b);
+		gfx_x = 0; gfx_y = 1;
+		gfx_setpixel(gfx_r, gfx_g, gfx_b);
+		gfx_dest = -1;
+		last_h = hue;
+		last_s = sat;
+		last_l = lum;
+		last_a = alpha;
+	);
+);
+
+function blit_tiled_display(x y w h hue sat lum alpha)
+local(coordinatelist l m xpos ypos last_x last_y last_w last_h)
+(
+	last_x != x || last_y != y || last_w != w || last_h != h ?
+	(
+		blit_prepare_display(hue, sat, lum, alpha);
+		x = ceil(x);
+		y = ceil(y);
+		coordinatelist=GFX_BUFFER_ADDR_BASE;
+		coordinatelist[0]=0;
+		coordinatelist[1]=0;
+		coordinatelist[2]=2;
+		coordinatelist[3]=2;
+		coordinatelist[6]=2;
+		coordinatelist[7]=2;
+		coordinatelist[8]=0;
+		coordinatelist[9]=0;
+		l = floor(w);
+		m = floor(h);
+		i = 0;
+		__n_i = ceil((l-0)/2);
+		loop (__n_i,
+			j = 0;
+			__n_j = ceil((m-0)/2);
+			loop (__n_j,
+				xpos = x+i;
+				ypos = y+j;
+				coordinatelist[4]= xpos - xpos % 2;
+				coordinatelist[5]= ypos - ypos % 2;
+				gfx_blitext(50, coordinatelist, 0);
+				j += 2;
+			);
+			i += 2;
+		);
+		last_x = x;
+		last_y = y;
+		last_w = w;
+		last_h = h;
+	);
+);
+
+function blit_tiled_display(x y w h)
+(
+	blit_tiled_display(x, y, w, h, 230, 0.5, 0.5, 1.0);
+);
+
+function blitOffScreen(idSrc idDest src_x src_y src_w src_h dest_x dest_y dest_w dest_h)
+local(gfx_last_buffer coordinatelist)
+(
+	gfx_last_buffer = gfx_dest;
+	gfx_dest = idDest;
+	gfx_w_local = 0;
+	gfx_h_local = 0;
+	gfx_getimgdim(idDest, gfx_w_local, gfx_h_local);
+	gfx_w_local != src_w || gfx_h_local != src_h ? gfx_setimgdim(idDest, src_w, src_h);
+	coordinatelist=GFX_BUFFER_ADDR_BASE+(idSrc+2)*GFX_BUFFER_SIZE;
+	coordinatelist[0]=src_x|0;
+	coordinatelist[1]=src_y|0;
+	coordinatelist[2]=src_w|0;
+	coordinatelist[3]=src_h|0;
+	coordinatelist[4]=dest_x|0;
+	coordinatelist[5]=dest_y|0;
+	coordinatelist[6]=dest_w|0;
+	coordinatelist[7]=dest_h|0;
+	coordinatelist[8]=0;
+	coordinatelist[9]=0;
+	gfx_blitext(idSrc, coordinatelist, 0);
+	gfx_dest = gfx_last_buffer;
+);
+
+function storeGfxBuffer(idDest src_x src_y src_w src_h)
+(
+	gfx_a_old = gfx_a;
+	gfx_a = 1;
+	blitOffScreen(-1, idDest, src_x, src_y, src_w, src_h, 0, 0, src_w, src_h);
+	gfx_a = gfx_a_old;
+);
+
+function restoreGfxBuffer(idSrc src_x src_y src_w src_h)
+(
+	gfx_a_old = gfx_a;
+	gfx_a = 1;
+	blitOffScreen(idSrc, -1, 0, 0, src_w, src_h, src_x, src_y, src_w, src_h);
+	gfx_a = gfx_a_old;
+);
+
+function gfx_init_buffer(id w h)
+(
+	gfx_start(id);
+	gfx_setimgdim(id, w, h);
+	blit_tiled_display(0,0,w,h);
+	gfx_end();
+);
+
+function blit_border(ix iy iw ih)
+(
+	gfx_r = 1; gfx_g = 0; gfx_b = 0; gfx_a = 0.125;
+	gfx_rect(ix, iy, iw, ih, 0);
+	gfx_r = 1; gfx_g = 1; gfx_b = 1; gfx_a = 0.5;
+	gfx_rect(ix, iy, iw, ih, 0);
+	gfx_r = 0; gfx_g = 0; gfx_b = 0; gfx_a = 1;
+	gfx_rect(ix-1, iy-1, iw+2, ih+2, 0);
+);
+
+function blit_border(ix iy iw ih hue sat lum)
+(
+	hsla(hue,0,0,0.125);
+	gfx_rect(ix, iy, iw, ih, 0);
+	hsla(hue,sat,lum,1);
+	gfx_rect(ix, iy, iw, ih, 0);
+	hsla(hue,sat,lum/8,1);
+	gfx_rect(ix-1, iy-1, iw+2, ih+2, 0);
+);
+
+function blit_debug_border(ix iy iw ih hue thicknessLeft thicknessRight thicknessTop thicknessBottom)
+(
+	GUI_RENDER_DEBUG_BORDERS == 1 ? (
+		hsla(hue,0.5,0.5,1);
+		gfx_rect(ix, iy, iw, thicknessTop);
+		gfx_rect(ix, iy + ih - thicknessBottom, iw, thicknessBottom);
+		gfx_rect(ix, iy, thicknessLeft, ih);
+		gfx_rect(ix + iw - thicknessRight, iy, thicknessRight, ih);
+	);
+);
+
+function blit_debug_border(ix iy iw ih hue thickness)
+(
+	blit_debug_border(ix, iy, iw, ih, hue, thickness, thickness, thickness, thickness);
+);
+
+function blitMoveBlock(src_x src_y src_w src_h dx)
+local(coordinatelist)
+(
+	gfx_a = 1;
+	coordinatelist=GFX_BUFFER_ADDR_BASE;
+	coordinatelist[0] = src_x;
+	coordinatelist[1] = src_y;
+	coordinatelist[2] = src_w;
+	coordinatelist[3] = src_h;
+	coordinatelist[4] = src_x + dx;
+	coordinatelist[5] = src_y;
+	coordinatelist[6] = src_w;
+	coordinatelist[7] = src_h;
+	coordinatelist[8] = 0;
+	coordinatelist[9] = 0;
+	gfx_blitext(gfx_dest, coordinatelist, 0);
+);
+
+function g_mem()
+(
+	this.TOC_PAGES = 255;
+	this.TOC_NAME_LEN = 16;
+	this.TOC_MARKER = 0x4E53;
+	this.TOC_USED = 0;
+	this.ADDR_TOC_MARKER = 0;
+	this.ADDR_TOC_RECORDS = this.ADDR_TOC_MARKER + 1;
+	this.ADDR_TOC_ADDRESSES = this.ADDR_TOC_RECORDS + 1;
+	this.ADDR_TOC_LENGTHS = this.ADDR_TOC_ADDRESSES + this.TOC_PAGES;
+	this.ADDR_TOC_PAGES = this.ADDR_TOC_LENGTHS + this.TOC_PAGES;
+	this.ADDR_TOC_NAMES = this.ADDR_TOC_PAGES + this.TOC_PAGES;
+	this.ADDR_TOC_DATA = this.ADDR_TOC_NAMES + this.TOC_PAGES * this.TOC_NAME_LEN;
+	gmem[this.ADDR_TOC_MARKER] != this.TOC_MARKER ?
+	(
+		gmem[this.ADDR_TOC_MARKER] = this.TOC_MARKER;
+		gmem[this.ADDR_TOC_RECORDS] = this.TOC_USED;
+	) :
+	(
+		this.TOC_USED = gmem[this.ADDR_TOC_RECORDS];
+	);
+);
+
+function g_mem_set_region_pages(id val)
+(
+	gmem[this.ADDR_TOC_PAGES + id] = val;
+);
+
+function g_mem_set_region_page_len(id val)
+(
+	gmem[this.ADDR_TOC_LENGTHS + id] = val;
+);
+
+function g_mem_set_region_name(id name)
+local(i)
+(
+	i = strlen(name);
+	while (i < this.TOC_NAME_LEN)
+	(
+		name = str_concat(name, " ");
+		i += 1;
+	);
+	i = 0;
+	while (i < this.TOC_NAME_LEN)
+	(
+		gmem[this.ADDR_TOC_NAMES + id * this.TOC_NAME_LEN + i] = str_getchar(name, i, "su");
+		i += 1;
+	);
+);
+
+function g_mem_get_region_addr(id)
+(
+	gmem[this.ADDR_TOC_ADDRESSES + id];
+);
+
+function g_mem_get_region_page_len(id)
+(
+	gmem[this.ADDR_TOC_LENGTHS + id];
+);
+
+function g_mem_get_region_pages(id)
+(
+	gmem[this.ADDR_TOC_PAGES + id];
+);
+
+function g_mem_add_region_addr(id)
+local(val)
+(
+	val = id == 0 ? this.ADDR_TOC_DATA : this.g_mem_get_region_addr(id - 1) + (this.g_mem_get_region_page_len(id - 1) * this.g_mem_get_region_pages(id - 1));
+	gmem[this.ADDR_TOC_ADDRESSES + id] = val;
+);
+
+function g_mem_clear_region_data(id)
+local(i l)
+(
+	i = this.g_mem_get_region_addr(id);
+	l = i + this.g_mem_get_region_pages(id) * this.g_mem_get_region_page_len(id);
+	while (i < l)
+	(
+		gmem[i] = 0x00;
+		i += 1;
+	);
+);
+
+function g_mem_add(name page_len)
+(
+	this.g_mem_add_region_addr(this.TOC_USED);
+	this.g_mem_set_region_pages(this.TOC_USED, 1);
+	this.g_mem_set_region_page_len(this.TOC_USED, page_len);
+	this.g_mem_set_region_name(this.TOC_USED, name);
+	this.g_mem_clear_region_data(this.TOC_USED);
+	this.TOC_USED += 1;
+	gmem[this.ADDR_TOC_RECORDS] = this.TOC_USED;
+	this.TOC_USED - 1;
+);
+
+function spectrum()
+(
+	this.resolution = 2^15;
+	this.fftsize = this.resolution;
+	this.windowsize = 0.5 / this.fftsize;
+	this.multiplier = $pi;
+	this.pi2 = $pi * 2;
+	this.minVol = 10 ^ (-192 * 8);
+	this.gainScale = 10 / log(10);
+	this.vgl0db = -7 / -64;
+	this.vgl24db = -23 / -64;
+	this.vgl48db = -39 / -64;
+	this.vgl72db = -56 / -64;
+	this.srate_half = srate >> 1;
+	this.recpos = 0;
+	this.fftsize = this.resolution;
+	this.fftsize_half = this.resolution >> 1;
+	this.ifftsize = (1 / this.fftsize) * 0.5;
+	this.histsize = 128 * 1024;
+	this.window = this.histsize;
+	this.fftworkspace = this.window + (this.resolution << 1);
+	this.lrecpos = 0;
+	this.size = 10000;
+	this.spectrum_v_width = 100;
+	this.width = this.size;
+	this.height = this.size;
+	g.g_mem();
+	this.frequencies = g.g_mem_get_region_addr(g.g_mem_add("frequencies", this.size));
+	this.amplitudes = g.g_mem_get_region_addr(g.g_mem_add("amplitudes", this.size));
+	this.red = g.g_mem_get_region_addr(g.g_mem_add("red", this.size));
+	this.green = g.g_mem_get_region_addr(g.g_mem_add("green", this.size));
+	this.blue = g.g_mem_get_region_addr(g.g_mem_add("blue", this.size));
+);
+
+function spectrum_render_vertical(w h)
+(
+	w > this.spectrum_v_width * 2 && h > this.spectrum_v_width ? 1 : 0;
+);
+
+function spectrum_init(map_image window_type scale brightness color_shift)
+(
+	this.map_image = map_image;
+	this.window_type = window_type;
+	this.scale = scale > 0 ? 1 : 0;
+	this.brightness = 1.5 - ((1 - brightness) / 2);
+	this.color_shift = color_shift/360;
+);
+
+function spectrum_fft_window_1()
+(
+	(0.35875 - 0.48829 * cos(this.winpos) + 0.14128 * cos(2 * this.winpos) - 0.01168 * cos(6 * this.winpos)) * this.multiplier * 0.5 / this.fftsize;
+);
+
+function spectrum_fft_window_2()
+local(mod cospos ce1 ce2 ce3 ce4 ce5 res)
+(
+	mod = 101.25;
+	cospos = cos(this.winpos);
+	ce1 = 0.248133 * mod;
+	ce2 = 0.770733 * mod * cospos;
+	ce3 = 0.591867 * mod * cos(2 * this.winpos);
+	ce4 = -0.0812 * mod * cos(6 * this.winpos);
+	ce5 = 0.030667 * mod * cospos;
+	res = (ce1 - ce2 + ce3 - ce4 + ce5) * this.multiplier * 0.5 / this.fftsize;
+	res*res;
+);
+
+function spectrum_fft_window_3()
+local(mod cospos ce1 ce2 ce3 ce4 ce5 res)
+(
+	mod = 128.0;
+	cospos = cos(this.winpos);
+	ce1 = -0.056;
+	ce2 = 0.4436 * cospos;
+	ce3 = -0.552533 * mod * cos(2 * this.winpos);
+	ce4 = -0.016 * mod * cos(6 * this.winpos);
+	ce5 = 0.936 * mod * cospos;
+	res = (ce1 - ce2 + ce3 - ce4 + ce5) * this.multiplier * 0.5 / this.fftsize;
+	resr*res;
+);
+
+function spectrum_sample(s0 s1)
+(
+	this.recpos[] = s0 + s1;
+	this.recpos += 1;
+	this.recpos >= this.histsize ? this.recpos = 0;
+);
+
+function spectrum_map_to_color(valY index)
+local(mW mH r g b mx my)
+(
+	this.map_val = valY;
+	gfx_dest_old = gfx_dest;
+	mW = 0;
+	mH = 0;
+	r = 0;
+	g = 0;
+	b = 0;
+	gfx_getimgdim(this.map_image, mW, mH);
+	mx = floor(this.color_shift * mW);
+	my = floor(valY * mH);
+	mx = clamp(mx, 0, mW);
+	my = clamp(my, 0, mH);
+	gfx_dest = this.map_image;
+	gfx_x = mx;
+	gfx_y = my;
+	gfx_getpixel(r, g, b);
+	gfx_dest = gfx_dest_old;
+	gmem[this.red+index] = round(clampNorm(r) * 256);
+	gmem[this.green+index] = round(clampNorm(g) * 256);
+	gmem[this.blue+index] = round(clampNorm(b) * 256);
+);
+
+function spectrum_generate()
+local(j dtwinpos buf1 buf2 buf3 i tpos mv spl_a spl_b dv my)
+(
+	this.recpos != this.lrecpos ?
+	(
+		(this.windowsize != this.fftsize-1 || this.last_window != this.window_type) ?
+		(
+			this.windowsize = this.fftsize-1;
+			j = 0;
+			dtwinpos = this.pi2 / this.windowsize;
+			this.winpos = 0;
+			this.last_window = this.window_type;
+			loop(
+				this.fftsize,
+				this.window[j] = this.window_type == 0 ? this.spectrum_fft_window_1() : (this.window_type == 1 ? this.spectrum_fft_window_2() : this.spectrum_fft_window_3());
+				this.winpos += dtwinpos;
+				j += 1;
+			);
+		);
+		this.lrecpos = this.recpos;
+		buf1 = this.lrecpos - this.fftsize;
+		(buf1 < 0) ? buf1 += this.histsize;
+		buf2 = this.window;
+		buf3 = this.fftworkspace;
+		loop(
+			this.fftsize,
+			buf3[] = buf1[] * buf2[];
+			buf3[1] = 0;
+			buf3 += 2;
+			buf2 += 1;
+			(buf1 += 1) >= this.histsize ? buf1 -= this.histsize;
+		);
+		fft(this.fftworkspace, this.fftsize);
+		fft_permute(this.fftworkspace, this.fftsize);
+		i = 0;
+		loop(this.height,
+			tpos = px2bin(i, this.fftsize, this.height, this.scale) >> 1;
+			tpos >= this.fftsize_half ? tpos = this.fftsize_half;
+			this.lfftpos >= tpos ? ( this.lfftpos = tpos-1; );
+			mv = 0;
+			loop(tpos - this.lfftpos,
+				this.j = max(this.lfftpos,0) << 1;
+				spl_a = this.fftworkspace[this.j];
+				spl_b = this.fftworkspace[this.j + 1];
+				dv = spl_a * spl_a + spl_b * spl_b;
+				dv /= 20;
+				dv < 0.00000000000000000000001 ? dv = 0.0000000000000000000000001;
+				dv > mv ? mv = dv;
+				this.lfftpos += 1;
+			);
+			mv = mv <= this.minVol ? -500 : log(mv) * this.gainScale;
+			my = mv / -96;
+			gmem[this.frequencies+i] = round(px2hz((this.height - i - 1), this.height, this.scale));
+			gmem[this.amplitudes+i] = max(0, round((1 - my) * this.width));
+			this.spectrum_map_to_color(abs(my)^abs(this.brightness), i);
+			i += 1;
+		);
+	);
+);
+
+function spectrum_get_all(i n)
+local(j)
+(
+	j = round((i / n) * this.size);
+	this.frequency = gmem[this.frequencies+j];
+	this.amplitude = gmem[this.amplitudes+j] / this.size;
+	this.r = gmem[this.red+j] / 256;
+	this.g = gmem[this.green+j] / 256;
+	this.b = gmem[this.blue+j] / 256;
+);
+
+function spectrum_get_freq_at_cursor()
+local(f)
+(
+	this.show_spectrogram == 1 ?
+	(
+		f = px2hz((this.y_start + this.max_height) - mouse_y, this.max_height, this.scale);
+	) :
+	(
+		f = px2hz(mouse_x - this.x_start, this.max_width, this.scale);
+	);
+	f;
+);
+
+function spectrum_get_amplitude_at_cursor()
+local(j a)
+(
+	this.show_spectrogram == 1 ?
+	(
+		j = round((((this.y_start + this.max_height) - mouse_y) / this.max_height) * this.size);
+		a = gmem[this.amplitudes+j] / this.size;
+	) :
+	(
+		j = round(((mouse_x - this.x_start) / this.max_width) * this.size);
+		a = gmem[this.amplitudes+j] / this.size;
+	);
+	a;
+);
+
+function spectrum_draw_pixels_vertical()
+local(sw w2 sp_w x1 x0 k y1 gx)
+(
+	sw = this.max_width;
+	w2 = min(this.max_width, this.spectrum_v_width);
+	sp_w = sw - w2;
+	x1 = this.x_start + sp_w;
+	x0 = x1 + w2;
+	k = 0;
+	gfx_a = 0.25;
+	gfx_r = 0;
+	gfx_g = 0;
+	gfx_b = 0;
+	gfx_rect(x1, this.y_start, w2, this.max_height);
+	y1 = this.y_start + this.max_height;
+	loop(this.max_height,
+		this.spectrum_get_all(k, this.max_height);
+		gx = gfx_x = round(x1 + this.amplitude * w2);
+		gfx_y = round(y1 - k);
+		gfx_r = this.r;
+		gfx_g = this.g;
+		gfx_b = this.b;
+		gfx_a = 0.95;
+		while (gfx_x > x1)
+		(
+			gfx_setpixel(this.r, this.g, this.b);
+			gfx_x -= 1;
+		);
+		gfx_a = 0.95;
+		gfx_x = x1 - THEME_PADDING_SUB;
+		gfx_setpixel(this.r, this.g, this.b);
+		k += 1;
+	);
+);
+
+function spectrum_draw_pixels_horizontal()
+local(y0 k y1 gy)
+(
+	y0 = this.y_start;
+	k = 0;
+	gfx_a = 0.25;
+	gfx_r = 0;
+	gfx_g = 0;
+	gfx_b = 0;
+	gfx_rect(this.x_start, this.y_start, this.max_width, this.max_height);
+	y1 = this.y_start + this.max_height;
+	loop(this.max_width,
+		this.spectrum_get_all(k, this.max_width);
+		gfx_x = round(this.x_start + k);
+		gy = gfx_y = round(y1 - this.amplitude * this.max_height);
+		gfx_r = this.r;
+		gfx_g = this.g;
+		gfx_b = this.b;
+		gfx_a = 0.95;
+		while (gfx_y < y1)
+		(
+			gfx_setpixel(this.r, this.g, this.b);
+			gfx_y += 1;
+		);
+		gfx_y = gy;
+		gfx_a = 0.25;
+		while (gfx_y > y0)
+		(
+			gfx_setpixel(0, 0, 0.35);
+			gfx_y -= 1;
+		);
+		k += 1;
+	);
+);
+
+function spectrum_draw_pixels()
+(
+	this.show_spectrogram == 1 ?
+	(
+		this.spectrum_draw_pixels_vertical();
+	) :
+	(
+		this.spectrum_draw_pixels_horizontal();
+	);
+);
+
+function spectrum_draw_marker(f full_size)
+local(px y_start_2)
+(
+	this.show_spectrogram == 1 ?
+	(
+		px = hz2px(f, this.max_height, this.scale);
+		y_start_2 = (this.y_start + this.max_height) - px;
+		y_start_2 >= this.y_start ?
+		(
+			gfx_line(this.x_start + (full_size == 0 ? (this.max_width - this.spectrum_v_width) : 0), y_start_2, this.x_start + this.max_width, y_start_2);
+		);
+	) :
+	(
+		px = hz2px(f, this.max_width, this.scale);
+		gfx_line(this.x_start + px, this.y_start, this.x_start + px, this.y_start + this.max_height);
+	);
+);
+
+function spectrum_draw_freq_markers(f baseBands octaveBands)
+(
+	this.mouse_hover ?
+	(
+		(baseBands && (f == 20 || f == 100 || f == 1000 || f == 10000 || f == 20000)) ?
+		(
+			gfx_r = 1; gfx_g = 1; gfx_b = 0; gfx_a = 1;
+			this.spectrum_draw_marker(f, 0);
+		);
+		(octaveBands && (f == 7 || f == 14 || f == 27 || f == 55 || f == 110 || f == 220 || f == 440 || f == 880 || f == 1760 || f == 3520 || f == 7040 || f == 14080 || f == 28160)) ?
+		(
+			gfx_r = 1; gfx_g = 0; gfx_b = 0; gfx_a = 1;
+			this.spectrum_draw_marker(f, 0);
+		);
+	);
+);
+
+function spectrum_draw_region(f_start f_end)
+local(px_s px_e px_dt)
+(
+	gfx_r = 0.95; gfx_g = 0.05; gfx_b = 0; gfx_a = 0.25;
+	this.show_spectrogram == 1 ?
+	(
+		px_s = hz2px(f_start, this.max_height, this.scale);
+		px_e = hz2px(f_end, this.max_height, this.scale);
+		px_dt = px_e - px_s;
+		gfx_rect(this.x_start + this.max_width - this.spectrum_v_width, this.y_start + this.max_height - px_e, this.spectrum_v_width, px_dt);
+	) :
+	(
+		px_s = hz2px(f_start, this.max_width, this.scale);
+		px_e = hz2px(f_end, this.max_width, this.scale);
+		px_dt = px_e - px_s;
+		gfx_rect(this.x_start + px_s, this.y_start, px_dt, this.max_height);
+	);
+);
+
+function spectrum_draw_grid()
+local(f mod)
+(
+	gfx_r = 0.95; gfx_g = 0.05; gfx_b = 0; gfx_a = 0.25;
+	this.spectrum_draw_region(0, 20);
+	this.spectrum_draw_region(20000, this.srate_half);
+	f = 0;
+	mod = 10;
+	loop(this.srate_half,
+		((f % mod) == 0) ?
+		(
+			gfx_r = 0.25; gfx_g = 0.75; gfx_b = 0; gfx_a = 0.45;
+			this.spectrum_draw_marker(f, 0);
+		);
+		this.spectrum_draw_freq_markers(f, mouse_cap == 0, mouse_cap > 0);
+		f += 1;
+		(f == 100) ? mod = 100 : ((f == 1000) ? mod = 1000; );
+	);
+);
+
+function spectrum_draw_overtone_marker(f n)
+(
+	this.spectrum_draw_marker(getPartial(f, n), 1);
+);
+
+function spectrum_draw_overtone_markers()
+local(f)
+(
+	gfx_r = 1.0; gfx_g = 1.0; gfx_b = 0.0; gfx_a = 1.0;
+	this.show_spectrogram == 1 ?
+	(
+		f = px2hz((this.y_start + this.max_height) - mouse_y, this.max_height, this.scale);
+	) :
+	(
+		f = px2hz(mouse_x - this.x_start, this.max_width, this.scale);
+	);
+	this.mouse_hover ?
+	this.spectrum_draw_overtone_marker(f, 1);
+	this.mouse_hover && mouse_cap ?
+	(
+		this.spectrum_draw_overtone_marker(f, 2);
+		this.spectrum_draw_overtone_marker(f, 3);
+		this.spectrum_draw_overtone_marker(f, 4);
+		this.spectrum_draw_overtone_marker(f, 5);
+		this.spectrum_draw_overtone_marker(f, 6);
+		this.spectrum_draw_overtone_marker(f, 7);
+		this.spectrum_draw_overtone_marker(f, 8);
+		this.spectrum_draw_overtone_marker(f, 9);
+		this.spectrum_draw_overtone_marker(f, 10);
+	);
+);
+
+function spectrum_draw_tooltip()
+local(f a key str)
+(
+	this.mouse_hover == 1 ?
+	(
+		f = this.spectrum_get_freq_at_cursor();
+		a = this.spectrum_get_amplitude_at_cursor();
+		key = hz2keyName(f);
+		str = #;
+		a <= 0 ?
+		(
+			sprintf(str, "%5d Hz\n%s\n%6s dB", f, key, " -");
+		) :
+		(
+			sprintf(str, "%5d Hz\n%s\n%6.2f dB", f, key, 20 * log10(a));
+		);
+		showToolTip(this.x_start, this.y_start, this.max_width, this.max_height, str);
+	);
+);
+
+function spectrum_draw(x_start y_start max_width max_height scroll_by)
+local(sp_x sp_y sp_h sp_w sp_dx sp_w_2 offscreen_bg_spectrogram)
+(
+	this.show_spectrogram = this.spectrum_render_vertical(max_width, max_height);
+	this.mouse_hover = mouseInArea(x_start, y_start, max_width, max_height);
+	this.x_start = x_start;
+	this.y_start = y_start;
+	this.max_width = max_width;
+	this.max_height = max_height;
+	sp_x = x_start;
+	sp_y = y_start;
+	sp_h = max_height;
+	sp_w = max_width;
+	sp_dx = max_width > this.spectrum_v_width ? max_width - this.spectrum_v_width : 0;
+	sp_w_2 = sp_x + sp_dx + 2 - THEME_PADDING_SUB;
+	blurArea(sp_x + sp_dx, sp_y, sp_w, sp_h, 4);
+	this.spectrum_generate();
+	offscreen_bg_spectrogram = 121;
+	this._RESTORE == 0 ? this._RESTORE = GFX_OFF_SCREEN_ADDR_BASE;
+	this._RESTORE[offscreen_bg_spectrogram] == 1 ? restoreGfxBuffer(offscreen_bg_spectrogram, sp_x, sp_y, sp_w_2, sp_h);
+	blitMoveBlock(sp_x + 2, sp_y, sp_dx + 2- THEME_PADDING_SUB, sp_h, scroll_by);
+	this.spectrum_draw_pixels();
+	storeGfxBuffer(offscreen_bg_spectrogram, sp_x, sp_y, sp_w_2, sp_h);
+	this._RESTORE[offscreen_bg_spectrogram] = 1;
+	this.spectrum_draw_grid();
+	this.spectrum_draw_overtone_markers();
+	this.spectrum_draw_tooltip();
+);
+SP.spectrum();
+
+function layout()
+(
+	this.address = UI_BUFFER_ADDR_BASE;
+	this.main = UI_BUFFER_ADDR_MAIN;
+	this.sub = UI_BUFFER_ADDR_SUB;
+	this.status.status();
+);
+
+function layout_pixelAdd(x y r g b)
+(
+	(w != 0 && h != 0) ?
+	(
+		gfx_x = x;
+		gfx_y = y;
+		gfx_getpixel(rpx, gpx, bpx);
+		gfx_setpixel(rpx+r, gpx+g, bpx+b);
+	);
+);
+
+function layout_subgrid_select(c r col_span row_span)
+local(x y w h bx by bw bh)
+(
+	x = this.main_x + THEME_PADDING_MAIN_LEFT;
+	y = this.main_y + THEME_PADDING_MAIN_TOP;
+	w = this.main_w - THEME_PADDING_MAIN_LEFT - THEME_PADDING_MAIN_RIGHT;
+	h = this.main_h - THEME_PADDING_MAIN_TOP - THEME_PADDING_MAIN_BOTTOM;
+	bx = (w / this.sub_cols) * c;
+	by = (h / this.sub_rows) * r;
+	bw = w / this.sub_cols;
+	bh = h / this.sub_rows;
+	(col_span > 1) ? bw *= col_span;
+	(row_span > 1) ? bh *= row_span;
+	bx += THEME_PADDING_SUB / 2;
+	bw -= THEME_PADDING_SUB;
+	by += THEME_PADDING_SUB / 2;
+	bh -= THEME_PADDING_SUB;
+	bx += x;
+	by += y;
+	this.sub.selection.x = snapXToPixels(bx);
+	this.sub.selection.y = snapYToPixels(by);
+	this.sub.selection.h = snapWidthToPixels(bh);
+	this.sub.selection.w = snapHeightToPixels(bw);
+	blit_debug_border(
+		bx,by,bw,bh,
+		30+(r+c)*2,
+		2
+	);
+);
+
+function layout_grid_select(c r cols rows)
+(
+	this.main.selection.w = snapXToPixels(this.main_w - THEME_PADDING_MAIN_LEFT - THEME_PADDING_MAIN_RIGHT);
+	this.main.selection.h = snapYToPixels(this.main_h - THEME_PADDING_MAIN_TOP - THEME_PADDING_MAIN_BOTTOM);
+	this.main.selection.x = snapWidthToPixels((this.main.selection.w / this.main_cols) * c + THEME_PADDING_MAIN_LEFT);
+	this.main.selection.y = snapHeightToPixels((this.main.selection.h / this.main_crows) * r + THEME_PADDING_MAIN_TOP);
+);
+
+function layout_grid(x y w h cols rows)
+(
+	this.main = this.address;
+	this.main_subgrids = 0;
+	this.main_x = x;
+	this.main_y = y;
+	this.main_w = w;
+	this.main_h = h;
+	this.main_cols = cols;
+	this.main_rows = rows;
+	this.layout_grid_select(0, 0, cols, rows);
+);
+
+function layout_subgrid(s_cols s_rows)
+(
+	this.sub = this.address + 25 + this.main_subgrids * 25;
+	this.main_subgrids += 1;
+	this.sub_cols = s_cols;
+	this.sub_rows = s_rows;
+	this.layout_subgrid_select(0, 0, s_cols, s_rows);
+);
+
+function layout_hover()
+(
+	mouseInArea(this.sub.selection.x, this.sub.selection.y, this.sub.selection.w, this.sub.selection.h);
+);
+
+function layout_hover(sub_x sub_y div_x div_y)
+(
+	mouseInArea(ceil(this.sub.selection.x+sub_x*floor(this.sub.selection.w/div_x))+1,
+	ceil(this.sub.selection.y+sub_y*floor(this.sub.selection.h/div_y))+1,
+	floor(this.sub.selection.w/div_x)-2, floor(this.sub.selection.h/div_y)-2);
+);
+
+function layout_grid_background()
+(
+	GUI_RENDER_GRID_BACKGROUND == 1 ?
+	(
+		gfx_a = 1;
+		blit_tiled_display(this.main_x, this.main_y, this.main_w, this.main_h, THEME_COLORS_MAIN_HUE, THEME_COLORS_MAIN_SAT, THEME_COLORS_MAIN_LUM, 1);
+	);
+);
+
+function layout_subgrid_background()
+(
+	GUI_RENDER_SUBGRID_BACKGROUND == 1 ?
+	(
+		gfx_a = 1;
+		blit_tiled_display(this.sub.selection.x, this.sub.selection.y, this.sub.selection.w, this.sub.selection.h, THEME_COLORS_DISPLAY_HUE, THEME_COLORS_SUB_SAT, THEME_COLORS_SUB_LUM, 1);
+	);
+);
+
+function layout_goniometer(c, r, cols, rows)
+(
+	this.layout_subgrid_select(c, r, cols, rows);
+	this.layout_subgrid_background();
+	GUI_RENDER_COMPONENTS == 1 ?
+	(
+		ix = this.sub.selection.x;
+		iy = this.sub.selection.y;
+		iw = this.sub.selection.w;
+		ih = this.sub.selection.h;
+		GM.goniometer_normalize_samples();
+		l = min(GM.b, GM.samples);
+		cx = ix + iw/2;
+		cy = iy + ih/2;
+		wn = iw / GM.spl_normalized;
+		hn = ih / GM.spl_normalized;
+		offscreen_bg = 41;
+		this._RESTORE == 0 ? this._RESTORE = GFX_OFF_SCREEN_ADDR_BASE;
+		this._RESTORE[offscreen_bg] == 1 ? restoreGfxBuffer(offscreen_bg, ix, iy, iw, ih);
+		hsla(THEME_COLORS_DISPLAY_HUE, THEME_COLORS_SUB_SAT_DIM, THEME_COLORS_SUB_LUM_DIM, 0.15);
+		gfx_rect(ix, iy, iw, ih, 0.6);
+		blurArea(ix, iy, iw, ih, 4);
+		ST.status_is_playing() ?
+		(
+			hsla(90-90*GM.ph, 0.5, 0.25+0.25*(1-GM.ph), 0.85);
+			gr = gfx_r;
+			gb = gfx_b;
+			gg = gfx_g;
+			hsla(180-180*GM.ph, 0.5, 0.5*(1-GM.ph), 0.25);
+			i = 0;
+			__n_i = ceil((l-0)/1);
+			loop (__n_i,
+				tx = cx + (GM.goniometer_x(i) * wn);
+				ty = cy - (GM.goniometer_y(i) * hn);
+				blurArea(tx-1, ty-1, 2, 2, 2);
+				gfx_a = 0.05;
+				gfx_rect(tx-1, ty-1, 2, 2, 1);
+				gfx_a = 1;
+				this.layout_pixelAdd(tx, ty, gr, gg, gb);
+				i += 1;
+			);
+			storeGfxBuffer(offscreen_bg, ix, iy, iw, ih);
+			this._RESTORE[offscreen_bg] = 1;
+		);
+		GM.b = 0;
+		iw != last_w || ih != last_h ?
+		(
+			gfx_init_buffer(offscreen_bg, iw, ih);
+			gfx_dest = offscreen_bg;
+			blit_tiled_display(ix, iy, iw, ih, THEME_COLORS_DISPLAY_HUE, THEME_COLORS_SUB_SAT_DIM, THEME_COLORS_SUB_LUM_DIM, 1);
+			gfx_dest = -1;
+			GM.goniometer_SIZE = min(iw, ih)-20;
+			GM.goniometer_half_size = GM.goniometer_SIZE/2;
+			GM.goniometer_sizeDSqr05 = GM.goniometer_half_size * 0.70710681;
+			dh = (ih-GM.goniometer_SIZE)/2;
+			dw = (iw-GM.goniometer_SIZE)/2;
+			gs = GM.goniometer_SIZE;
+			gc = GM.goniometer_half_size;
+		);
+		gfx_r = 1; gfx_g = 1; gfx_b = 1; gfx_a = 0.5;
+		x = (ix + iw)|0;
+		x2 = (ix + iw / 2)|0;
+		y = (iy + ih)|0;
+		y2 = (iy + ih / 2)|0;
+		gfx_line(x2, iy, x2, y, 16);
+		gfx_line(ix, iy, x, y, 16);
+		gfx_line(x, iy, ix, y, 16);
+		gfx_line(ix, y2, x, y2, 16);
+		blit_border(ix, iy, iw, ih);
+		label_top_left = "+L";
+		label_top_right = "-R";
+		label_bottom_left = "+R";
+		label_bottom_right = "-L";
+		gfx_measurestr(label_top_left, w, h);
+		drawStringOutlined(ix+10, iy+10, label_top_left);
+		gfx_measurestr(label_top_right, w, h);
+		drawStringOutlined(ix+(iw-10-w), iy+10, label_top_right);
+		gfx_measurestr(label_bottom_left, w, h);
+		drawStringOutlined(ix+10, iy+(ih-10-h), label_bottom_left);
+		gfx_measurestr(label_bottom_right, w, h);
+		drawStringOutlined(ix+(iw-10-w), iy+(ih-10-h), label_bottom_right);
+		this.layout_hover() ?
+		(
+			phase = (GM.ph*10);
+			ptype = #;
+			ptype = (phase >= 9.9) ? "Out Of Phase" : (phase <= 0.1 ? "Mono" : (GM.in_phase != -1) ? (GM.in_phase ? "Left Only" : "Right Only") : "Stereo");
+			str = #;
+			sprintf(str, "%s", ptype);
+			showToolTip(mouse_x, mouse_y-10, 100, 20, str);
+		);
+		last_w = iw;
+		last_h = ih;
+	);
+);
+
+function layout_volume(meter_id spl_l_min spl_l_max spl_r_min spl_r_max min_hue max_hue min_sat max_sat min_lum max_lum min_a max_a c r cols rows)
+local(movement ix iy iw ih sx sy x qh y y2 offscreen_bg_vol l_min l_max r_min r_max lh1 lh rh1 rh)
+(
+	movement = 1;
+	this.layout_subgrid_select(c, r, cols, rows);
+	this.layout_subgrid_background();
+	GUI_RENDER_COMPONENTS == 1 ?
+	(
+		ix = this.sub.selection.x;
+		iy = this.sub.selection.y;
+		iw = this.sub.selection.w;
+		ih = this.sub.selection.h;
+		sx = ix;
+		sy = iy;
+		x = ix + iw - movement;
+		qh = floor(ih / 4);
+		y = iy + qh;
+		y2 = (iy + ih) - qh;
+		this.rh = (max_hue - min_hue)*2;
+		this.rs = max_sat - min_sat;
+		this.rl = max_lum - min_lum;
+		this.ra = max_a - min_a ;
+		offscreen_bg_vol = 80 + meter_id;
+		this._RESTORE == 0 ? this._RESTORE = GFX_OFF_SCREEN_ADDR_BASE;
+		this._RESTORE[offscreen_bg_vol] == 1 ? restoreGfxBuffer(offscreen_bg_vol, ix, iy, iw, ih);
+		this.status.status_is_playing() ? blitMoveBlock(ix+movement, iy, iw-movement, ih, -movement);
+		blit_tiled_display(x, iy, movement, ih, THEME_COLORS_DISPLAY_HUE, THEME_COLORS_SUB_SAT_DIM, THEME_COLORS_SUB_LUM_DIM, 1);
+		spl_l_min > 0 ? spl_l_min = 0;
+		spl_l_max < 0 ? spl_l_max = 0;
+		spl_r_min > 0 ? spl_r_min = 0;
+		spl_r_max < 0 ? spl_r_max = 0;
+		l_min = abs(spl_l_min);
+		l_max = abs(spl_l_max);
+		r_min = abs(spl_r_min);
+		r_max = abs(spl_r_max);
+		this.spl_l = -(l_max + l_min);
+		lh1 = floor(y - qh * l_max);
+		lh = floor(y + qh * l_min);
+		this.spl_r = -(r_max + r_min);
+		rh1 = floor(y2 - qh * r_max);
+		rh = floor(y2 + qh * r_min);
+		this.sl = abs(this.spl_l/2);
+		this.sr = abs(this.spl_r/2);
+		this.rhl = min_hue+this.rh*this.sl;
+		this.rhr = min_hue+this.rh*this.sr;
+		this.rsl = min_sat+this.rs*this.sl*this.sl;
+		this.rsr = min_sat+this.rs*this.sr*this.sr;
+		this.rll = min_lum+this.rl*this.sl*this.sl;
+		this.rlr = min_lum+this.rl*this.sr*this.sr;
+		this.ral = min_a+this.ra*this.sl*this.sl;
+		this.rar = min_a+this.ra*this.sr*this.sr;
+		hsla(this.rhl, this.rsl, this.rll, this.ral);
+		gfx_line(x, lh1, x, lh);
+		hsla(this.rhr, this.rsr, this.rlr, this.rar);
+		gfx_line(x, rh1, x, rh);
+		storeGfxBuffer(offscreen_bg_vol, ix, iy, iw, ih);
+		this._RESTORE[offscreen_bg_vol] = 1;
+		blit_border(ix, iy, iw, ih);
+	);
+);
+
+function layout_volume_mono(meter_id spl_min spl_max min_hue max_hue min_sat max_sat min_lum max_lum min_a max_a c r cols rows)
+local(movement ix iy iw ih sx sy x qh y y2 offscreen_bg_vol l_min l_max lh1 lh)
+(
+	movement = 1;
+	this.layout_subgrid_select(c, r, cols, rows);
+	this.layout_subgrid_background();
+	GUI_RENDER_COMPONENTS == 1 ?
+	(
+		ix = this.sub.selection.x;
+		iy = this.sub.selection.y;
+		iw = this.sub.selection.w;
+		ih = this.sub.selection.h;
+		sx = ix;
+		sy = iy;
+		x = ix + iw - movement;
+		qh = floor(ih / 2);
+		y = iy + qh;
+		y2 = (iy + ih) - qh;
+		this.rh = (max_hue - min_hue)*2;
+		this.rs = max_sat - min_sat;
+		this.rl = max_lum - min_lum;
+		this.ra = max_a - min_a ;
+		offscreen_bg_vol = 80 + meter_id;
+		this._RESTORE == 0 ? this._RESTORE = GFX_OFF_SCREEN_ADDR_BASE;
+		this._RESTORE[offscreen_bg_vol] == 1 ? restoreGfxBuffer(offscreen_bg_vol, ix, iy, iw, ih);
+		this.status.status_is_playing() ? blitMoveBlock(ix+movement, iy, iw-movement, ih, -movement);
+		blit_tiled_display(x, iy, movement, ih, THEME_COLORS_DISPLAY_HUE, THEME_COLORS_SUB_SAT_DIM, THEME_COLORS_SUB_LUM_DIM, 1);
+		spl_min > 0 ? spl_min = 0;
+		spl_max < 0 ? spl_max = 0;
+		l_min = abs(spl_min);
+		l_max = abs(spl_max);
+		this.spl_l = -(l_max + l_min);
+		lh1 = floor(y - qh * l_max);
+		lh = floor(y + qh * l_min);
+		this.sl = abs(this.spl_l/2);
+		this.rhl = min_hue+this.rh*this.sl;
+		this.rsl = min_sat+this.rs*this.sl*this.sl;
+		this.rll = min_lum+this.rl*this.sl*this.sl;
+		this.ral = min_a+this.ra*this.sl*this.sl;
+		hsla(this.rhl, this.rsl, this.rll, this.ral);
+		gfx_line(x, lh1, x, lh);
+		storeGfxBuffer(offscreen_bg_vol, ix, iy, iw, ih);
+		this._RESTORE[offscreen_bg_vol] = 1;
+		blit_border(ix, iy, iw, ih);
+	);
+);
+
+function layout_spectrum(spectrum_v_width c r cols rows)
+local(ix iy iw ih)
+(
+	this.layout_subgrid_select(c, r, cols, rows);
+	this.layout_subgrid_background();
+	GUI_RENDER_COMPONENTS == 1 ?
+	(
+		ix = this.sub.selection.x;
+		iy = this.sub.selection.y;
+		iw = this.sub.selection.w;
+		ih = this.sub.selection.h;
+		SP.spectrum_v_width = spectrum_v_width;
+		SP.spectrum_draw(ix, iy, iw, ih, this.status.status_is_playing() ? -1 : 0);
+		SP.show_spectrogram ?
+		(
+			blit_border(ix, iy, iw - SP.spectrum_v_width - THEME_PADDING_SUB, ih);
+			blit_border(ix + iw - SP.spectrum_v_width, iy, SP.spectrum_v_width , ih);
+		) :
+		(
+			blit_border(ix, iy, iw, ih);
+		);
+	);
+);
+
+function layout_frame()
+(
+	GUI_RENDER_FRAME == 1 ?
+	(
+		gfx_a = 0.25;
+		gfx_r = 0;
+		gfx_g = 0;
+		gfx_b = 0;
+		gfx_rect(this.main_x, this.main_y, THEME_FRAME_LEFT, this.main_h);
+		gfx_rect(this.main_x + this.main_w - THEME_FRAME_RIGHT, this.main_y, THEME_FRAME_RIGHT, this.main_h);
+		gfx_rect(this.main_x + THEME_FRAME_LEFT, this.main_y, this.main_w - THEME_FRAME_RIGHT - THEME_FRAME_LEFT, THEME_FRAME_TOP);
+		gfx_rect(this.main_x + THEME_FRAME_LEFT, this.main_y + this.main_h - THEME_FRAME_BOTTOM, this.main_w - THEME_FRAME_RIGHT - THEME_FRAME_LEFT, THEME_FRAME_BOTTOM);
+		gfx_a = 1;
+		blit_border(this.main_x+1, this.main_y+1, this.main_w-2, this.main_h-2, THEME_COLORS_MAIN_HUE, THEME_COLORS_MAIN_SAT, THEME_COLORS_MAIN_LUM);
+	);
+);
+ui.layout();
+BUFFERS_MAX = 100;
+GFX_BUFFERS_MAX = 1000;
+GFX_BUFFER_SIZE = 11;
+UI_BUFFER_SIZE = 25;
+GONIOMETER_BUFFER_SIZE = 2048;
+UI_BUFFER_ADDR_BASE = 16384*10;
+UI_BUFFER_ADDR_MAIN = UI_BUFFER_ADDR_BASE;
+UI_BUFFER_ADDR_SUB = UI_BUFFER_ADDR_BASE + UI_BUFFER_SIZE;
+GFX_BUFFER_ADDR_BASE = UI_BUFFER_ADDR_BASE + UI_BUFFER_SIZE * 4;
+GFX_OFF_SCREEN_ADDR_BASE = GFX_BUFFER_ADDR_BASE + GFX_BUFFERS_MAX * GFX_BUFFER_SIZE;
+GONIOMETER_BUFFER_ADDR_BASE = GFX_OFF_SCREEN_ADDR_BASE + GFX_BUFFERS_MAX * GFX_BUFFER_SIZE;
+GONIOMETER_BUFFER_ADDR_X = GONIOMETER_BUFFER_ADDR_BASE;
+GONIOMETER_BUFFER_ADDR_Y = GONIOMETER_BUFFER_ADDR_X + GONIOMETER_BUFFER_SIZE * 2 + 2;
+BUFFER_ADDR_BASE = GONIOMETER_BUFFER_ADDR_Y + GONIOMETER_BUFFER_SIZE * 2 + 2;
+BUFFER_ADDR_HEADERS = BUFFER_ADDR_BASE;
+BUFFER_ADDR_ADDRESSES = BUFFER_ADDR_BASE + BUFFERS_MAX;
+BUFFER_ADDR_DATA = BUFFER_ADDR_BASE + BUFFERS_MAX * 2;
+ST.status();
+
+function buffer_manager()
+(
+	this.header_addresses = BUFFER_ADDR_HEADERS;
+	this.header_lengths = BUFFER_ADDR_ADDRESSES;
+	this.data_start = BUFFER_ADDR_DATA;
+	this.data_size = 0;
+	this.buffers_in_use = -1;
+	this.buffers_max = BUFFERS_MAX;
+);
+
+function buffer_manager_address(id)
+(
+	this.header_addresses[id];
+);
+
+function buffer_manager_length(id)
+(
+	this.header_lengths[id];
+);
+
+function buffer_manager_size()
+local(l)
+(
+	l = this.buffers_in_use-1;
+	this.data_size = 0;
+	while (l >= 0)
+	(
+		this.data_size += this.header_lengths[l];
+		l -= 1;
+	);
+	this.data_size;
+);
+
+function buffer_manager_new(len)
+local(s addr)
+(
+	this.buffers_in_use += 1;
+	s = this.data_start;
+	s += this.buffer_manager_size();
+	this.__calc_addr = s;
+	this.header_lengths[this.buffers_in_use] = len;
+	this.header_addresses[this.buffers_in_use] = s;
+	addr = this.header_addresses[this.buffers_in_use];
+	len -= 1;
+	while (len >= 0)
+	(
+		addr[l] = 0;
+		l -= 1;
+	);
+	this.buffers_in_use;
+);
+BM.buffer_manager();
+
+function buffer(len)
+(
+	this.buffer = BM.buffer_manager_new(len);
+	this.address = BM.buffer_manager_address(this.buffer);
+	this.address_end = BM.buffer_manager_address(this.buffer) + len;
+	this.length = BM.buffer_manager_length(this.buffer);
+	this.length_init = BM.buffer_manager_length(this.buffer);
+	this.index = 0;
+	this.index_reverse = this.length - 1;
+);
+// iir_mag = i1*i1 + i2*i2;
+ext_noinit = 1.0;
+gfx_clear = -1;
+
+/*||||||||||||||||||||||||||||||||||||||*/
+
+@slider
+/*||||||||||||||||||||||||||||||||||||||*/
+SP.spectrum_init(0, 1, 0, 1, slider1);
+
+/*||||||||||||||||||||||||||||||||||||||*/
+
+@block
+/*||||||||||||||||||||||||||||||||||||||*/
+
+/*||||||||||||||||||||||||||||||||||||||*/
+
+@sample
+/*||||||||||||||||||||||||||||||||||||||*/
+ST.status_update();
+ST.status_is_playing() ?
+(
+	fSamplesReset == 1 ?
+	(
+		minPhase = maxPhase = 0;
+		minVolL = maxVolL = 0;
+		minVolR = maxVolR = 0;
+		fSamplesReset = 0;
+	);
+	GM.goniometer_sample();
+	minPhase = min(minPhase, -GM.ph);
+	maxPhase = max(maxPhase, GM.ph);
+	minVolL = min(minVolL, spl0);
+	maxVolL = max(maxVolL, spl0);
+	minVolR = min(minVolR, spl1);
+	maxVolR = max(maxVolR, spl1);
+	SP.spectrum_sample(spl0, spl1);
+);
+
+/*||||||||||||||||||||||||||||||||||||||*/
+
+@gfx 435 185
+/*||||||||||||||||||||||||||||||||||||||*/
+gfx_w < 435 ? gfx_w = 435;
+gfx_h < 185 ? gfx_h = 185;
+fSamplesReset = 1;
+top_h = max(120, min(gfx_h*0.2, 120));
+ui.layout_grid(0, 0, gfx_w, top_h, 1, 1);
+ui.layout_grid_background();
+ui.layout_subgrid(4, 3);
+ui.layout_volume(2, minVolL, maxVolL, minVolR, maxVolR, 120, 360, 0.5, 0.5, 0.5, 0.5, 1, 1, 	0, 0, 3, 2);
+ui.layout_volume_mono(1, minPhase, maxPhase, 120, 360, 0.5, 0.5, 0.5, 0.5, 1, 1, 	0, 2, 3, 1);
+ui.layout_goniometer(	3, 0, 1, 3);
+spectrum_v_width = ui.sub.selection.w;
+ui.layout_frame();
+ui.layout_grid(0, top_h, gfx_w, gfx_h-top_h, 1, 1);
+ui.layout_grid_background();
+ui.layout_subgrid(1, 1);
+ui.layout_spectrum(spectrum_v_width, 	0, 0, 1, 1);
+ui.layout_frame();
+mouse_wheel = 0;
