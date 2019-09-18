@@ -36,12 +36,14 @@ Being able to control the phase of a signal allows you to create a wide range of
 ### ... Stereo Control (ns_ssc)
 **Version**: 1.0.1  
 
-Wanna mess with your stereo signal? Well, here you go. This can be useful to widen a signal, or to add some noise to it, or to do both at once.
+This allows you to pan and mix your input signal with either the mid or the side signal which allows a wide range of manipulation for your stereo field. Useful for spatial effects, mix separation and audio restoration. 
 
 ### ... Signal Meter (ns_ssm)
 **Version**: 1.0.0  
 
+Admit it, sometimes you just want to know what your audio looks like, right? Well, I do because that helps me to hone in on problems and it looks cool, too. This plugin is the third generation of my AudioAnalyzers ([v1](https://stash.reaper.fm/v/28703/NovaSonica%20-%20SonicAnalyzer%20-%202016-10-23.rar), [v2](https://stash.reaper.fm/v/16173/NovaSonica%20AudioAnalzer.rar)). I've rebuild all components to be scalable and make as much as possible of the available space. As such you can scale it to a small size where it will only show a spectrum, the history of phase, left and right signal, and a goniometer. But scale it up and it will also display a spectrogram. Hovering over the spectrum and spectrograph you can see some information about that spot like frequency, tone name and current volume. If you keep you mouse pressed it will show you markers for overtones which you can, for example, use to find dominant frequencies / tones. 
 
 ### ... Stereo Polish (ns_ssm)
 **Version**: 1.0.1  
 
+Wanna mess with your stereo signal? Well, here you go. This can be useful to widen a signal, or to add some noise to it, or to do both at once.
