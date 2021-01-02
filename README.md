@@ -14,6 +14,45 @@ In less technical terms: it makes weird effects by messing around with a very sh
 A BPM-driven delay that makes use of stereo effects and allows you to blend forward and reverse delays using an XY-pad. 
 
 ### Mixing
+#### Sonic Stereo Mixer (ns_stm) v1.0.0
+This plugin is made to mix a stereo signal. Besides the usual features there are a some extras for more fine-grained control over your mix. 
+
+##### Features
+
+###### Volume
+It's a mixer, so volume is about the minimum of control you'd expect, right? Well, this mixer supports it too.
+
+###### Panning
+A stereo mixer obviously needs to have a panning function. But, there's balance and panning which are NOT the same thing. Usually for a stereo source you would use balance and for two mono sources (panned hard left and hard right) you would use panning. For your convenience you can switch between those two modes to suit your needs. By default the balance mode is used.
+
+###### Width
+Signal too wide? Just reduce the width. Or increase it if it's too narrow. This can be very useful to make the signal stand out in your mix.
+
+###### Phase Rotation
+This is useful when you have overlapping signals like a bass guitar and a kick drum. There are multiple ways to solve the issue: EQing, sidechaining and phase shifting. The latter can be applied using this knob. Usually a minute shift of the phase is all it takes. Obviously you can also use this to achieve special effects.
+
+###### LF:HF Balance
+Your signal sounds too boomy? Turn the knob to the right. Your signal sounds too flat? Turn the knob to the left.
+Under the hood this uses an LR4 crossover which is often used in speakers to split the signal into low-end and high-end signals. With the knob you control how much low-end and high-end is mixed together. By default the mix is 50/50 which means no modification of the original input. 
+
+###### Limiter
+This will ensure that your signal never exceeds -0.01dB in order to avoid clipping. Besides that it will also remove infrasound content (frequencies below 20Hz) by moving those frequencies into the audible low-end which ensures that you don't loose low-end punch while increasing the clarity of your signal. This is enabled by default.
+
+###### Input Mode
+Sometimes one needs to transform the input before mixing it. You can use any of the following input transforms:
+- Stereo: the signal is not transformed
+- Inverse: swaps the left and right channel
+- Mix: mixes the left and right channel together
+- Left: only uses the left channel of the input
+- Right: only uses the right channel of the input
+
+###### MIDI Out
+Sometimes it can be really useful to use the amplitude envelope of a signal to manipulate effect parameters. If enabled this feature will use two sliders to output the signal envelopes (left and right) and send MIDI CCs for each channel. It uses CC #90 for the left channel and CC #91 for the right channel. This way you can either link the sliders to parameters of other effects or use the MIDI output to control effect parameters. By default this feature is turned off.
+
+##### Automation
+Every feature has its own slider that can be used for automation. Especially useful if you use MIDI equipment with encoders to record automation. Unfortunately REAPER doesn't allow to link MIDI encoders to the volume, panning and width envelopes. With this plugin you can work around that limitation. 
+
+
 #### Sonic Auto Pan (ns_sap) v1.0.1
 The name says it, it tries to automatically pan your signal. 
 
@@ -32,7 +71,10 @@ Wanna mess with your stereo signal? Well, here you go. This can be useful to wid
 Admit it, sometimes you just want to know what your audio looks like, right? Well, I do because that helps me to hone in on problems and it looks cool, too. This plugin is the third generation of my AudioAnalyzers ([v1](https://stash.reaper.fm/v/28703/NovaSonica%20-%20SonicAnalyzer%20-%202016-10-23.rar), [v2](https://stash.reaper.fm/v/16173/NovaSonica%20AudioAnalzer.rar)). I've rebuild all components to be scalable and make as much use as possible of the available space. As such you can scale it to a small size where it will only show a spectrum, the history of phase, left and right signal, and a goniometer. But scale it up and it will also display a spectrogram. If you hover your mouse over the spectrum and spectrogram you can see some information about that spot like frequency, tone name and current volume. If you click and keep your mouse button pressed it will show you markers for overtones which you can, for example, use to find dominant frequencies / tones. 
 
 #### Sonic Boom Control (ns_sbc) v1.0.3
-Uses a couple of tricks to allow you to boost a signal by quite a bit without applying actual compression. It does use a very little to limit the output to -0.1 dB, but not for the actual boosting. Via an XY-pad you can control the sonic character and balance the high and low end of your signal. Besides that the Boom Control shifts infrasound ranges of the input into the audible low end which increases clarity without losing low end punch (a side effect that can occur when simply removing the infrasound frequencies). Untested, but this might be very useful for vinyl mastering. 
+Uses a couple of tricks to allow you to boost a signal by quite a bit without applying actual compression. It does use a very little to limit the output to -0.1 dB, but not for the actual boosting. With an XY-pad you can control the sonic character and balance the high and low end of your signal. Besides that the Boom Control shifts infrasound ranges of the input into the audible low end which increases clarity without losing low end punch (a side effect that can occur when simply removing the infrasound frequencies). Untested, but this might be very useful for vinyl mastering. 
+
+#### Sonic Limiter (ns_slm) v1.0.0
+This is a simple version of the Sonic Boom Control, for when you need less control and less visual cutter. With an XY-pad you can control the sonic character and balance the high and low end of your signal. And one slider lets you control how boomy your signal sounds. Besides that the Boom Control shifts infrasound ranges of the input into the audible low end which increases clarity without losing low end punch (a side effect that can occur when simply removing the infrasound frequencies). Untested, but this might be very useful for vinyl mastering. 
 
 #### Sonic Clean (ns_sc) v1.0.1  
 This removes infrasound (< 20 Hz) and ultrasound (> 20 kHz) from your signal. Unless you want to make your listeners feel unwell there is no reason to keep these frequencies, filtering them increases clarity and reduces problems that appear when playing your audio through different stereo sets.
