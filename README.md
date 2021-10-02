@@ -79,6 +79,13 @@ This is a simple version of the Sonic Boom Control, for when you need less contr
 #### Sonic Clean (ns_sc) v1.0.1  
 This removes infrasound (< 20 Hz) and ultrasound (> 20 kHz) from your signal. Unless you want to make your listeners feel unwell there is no reason to keep these frequencies, filtering them increases clarity and reduces problems that appear when playing your audio through different stereo sets.
 
+### Hardware Control
+#### Sonic Beatstep Sequencer Controller (ns_sbsc) v1.0.0.0
+This is a plugin to control the sequencer section of an Arturia Beatstep. You can enable/disable each step, set its base note and transpose it up or down. Furthermore you can set the scale, overall transpose, the swing setting and the gate setting. MIDI input to the plugin strips note-on events and uses their note values to transpose the sequence and transmits the step volume as CC #7. All other MIDI input is mapped to the MIDI channel selected and sent through without further modification. 
+
+#### Sonic MPD218 Control (ns_smpd218) v1.0.0
+This is a simple plugin to control the Full Level and Note Repeat buttons of an AKAI MPD218 unit. 
+
 ## How To Install
 In REAPER open the `Options` menu and select `Show REAPER resource path in explorer/finder...`. This will open the directory where your REAPER installation lives. Open the directory `Effects` and drop the effects in there. It is a good idea to keep them in directories like in the repo, so you can install different versions and use them side by side in case of changes that break backwards compatibility. 
 
