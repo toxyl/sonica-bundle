@@ -1,0 +1,1398 @@
+desc:Sonic Beatstep Sequencer Control v1.0.0 (NovaSonica)
+options:no_meter
+in_pin:none
+out_pin:none
+slider1:2<0,7,{Chromatic,Major,Minor,Dorian,Mixolydian,Harmonic Minor,Blues,User}>-Scale
+slider2:4<0,8,{-4,-3,-2,-1,0,+1,+2,+3,+4}>-Octave
+slider3:0<0,11,{0 (C),+1 (C#),+2 (D),+3 (D#),+4 (E),+5 (F),+6 (F#),+7 (G),+8 (G#),+9 (A),+10 (A#),+11 (B)}>-Semitones
+slider4:2<0,3,{1/4,1/8,1/16,1/32}>-Step Size
+slider5:15<0,15,{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}>-Length
+slider6:0<0,3,{FWD,REV,ALT,RAND}>-Mode
+slider7:0<0,1,{off,on}>-Legato
+slider8:91<0,100,1>-Gate
+slider9:62<0,100,1>-Swing
+slider11:1<0,1,{Off,On}>-Enabled 1
+slider12:1<0,1,{Off,On}>-Enabled 2
+slider13:1<0,1,{Off,On}>-Enabled 3
+slider14:1<0,1,{Off,On}>-Enabled 4
+slider15:1<0,1,{Off,On}>-Enabled 5
+slider16:1<0,1,{Off,On}>-Enabled 6
+slider17:1<0,1,{Off,On}>-Enabled 7
+slider18:1<0,1,{Off,On}>-Enabled 8
+slider19:1<0,1,{Off,On}>-Enabled 9
+slider20:1<0,1,{Off,On}>-Enabled 10
+slider21:1<0,1,{Off,On}>-Enabled 11
+slider22:1<0,1,{Off,On}>-Enabled 12
+slider23:1<0,1,{Off,On}>-Enabled 13
+slider24:1<0,1,{Off,On}>-Enabled 14
+slider25:1<0,1,{Off,On}>-Enabled 15
+slider26:1<0,1,{Off,On}>-Enabled 16
+slider27:0<0,11,{C,C#,D,D#,E,F,F#,G,G#,A,A#,B}>-Note 1
+slider28:0<0,11,{C,C#,D,D#,E,F,F#,G,G#,A,A#,B}>-Note 2
+slider29:0<0,11,{C,C#,D,D#,E,F,F#,G,G#,A,A#,B}>-Note 3
+slider30:0<0,11,{C,C#,D,D#,E,F,F#,G,G#,A,A#,B}>-Note 4
+slider31:0<0,11,{C,C#,D,D#,E,F,F#,G,G#,A,A#,B}>-Note 5
+slider32:0<0,11,{C,C#,D,D#,E,F,F#,G,G#,A,A#,B}>-Note 6
+slider33:0<0,11,{C,C#,D,D#,E,F,F#,G,G#,A,A#,B}>-Note 7
+slider34:0<0,11,{C,C#,D,D#,E,F,F#,G,G#,A,A#,B}>-Note 8
+slider35:0<0,11,{C,C#,D,D#,E,F,F#,G,G#,A,A#,B}>-Note 9
+slider36:0<0,11,{C,C#,D,D#,E,F,F#,G,G#,A,A#,B}>-Note 10
+slider37:0<0,11,{C,C#,D,D#,E,F,F#,G,G#,A,A#,B}>-Note 11
+slider38:0<0,11,{C,C#,D,D#,E,F,F#,G,G#,A,A#,B}>-Note 12
+slider39:0<0,11,{C,C#,D,D#,E,F,F#,G,G#,A,A#,B}>-Note 13
+slider40:0<0,11,{C,C#,D,D#,E,F,F#,G,G#,A,A#,B}>-Note 14
+slider41:0<0,11,{C,C#,D,D#,E,F,F#,G,G#,A,A#,B}>-Note 15
+slider42:0<0,11,{C,C#,D,D#,E,F,F#,G,G#,A,A#,B}>-Note 16
+slider43:4<0,8,{-4,-3,-2,-1,0,+1,+2,+3,+4}>-Octave 1
+slider44:4<0,8,{-4,-3,-2,-1,0,+1,+2,+3,+4}>-Octave 2
+slider45:4<0,8,{-4,-3,-2,-1,0,+1,+2,+3,+4}>-Octave 3
+slider46:4<0,8,{-4,-3,-2,-1,0,+1,+2,+3,+4}>-Octave 4
+slider47:4<0,8,{-4,-3,-2,-1,0,+1,+2,+3,+4}>-Octave 5
+slider48:4<0,8,{-4,-3,-2,-1,0,+1,+2,+3,+4}>-Octave 6
+slider49:4<0,8,{-4,-3,-2,-1,0,+1,+2,+3,+4}>-Octave 7
+slider50:4<0,8,{-4,-3,-2,-1,0,+1,+2,+3,+4}>-Octave 8
+slider51:4<0,8,{-4,-3,-2,-1,0,+1,+2,+3,+4}>-Octave 9
+slider52:4<0,8,{-4,-3,-2,-1,0,+1,+2,+3,+4}>-Octave 10
+slider53:4<0,8,{-4,-3,-2,-1,0,+1,+2,+3,+4}>-Octave 11
+slider54:4<0,8,{-4,-3,-2,-1,0,+1,+2,+3,+4}>-Octave 12
+slider55:4<0,8,{-4,-3,-2,-1,0,+1,+2,+3,+4}>-Octave 13
+slider56:4<0,8,{-4,-3,-2,-1,0,+1,+2,+3,+4}>-Octave 14
+slider57:4<0,8,{-4,-3,-2,-1,0,+1,+2,+3,+4}>-Octave 15
+slider58:4<0,8,{-4,-3,-2,-1,0,+1,+2,+3,+4}>-Octave 16
+slider60:0<0,15,{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}>-MIDI Channel
+
+/*||||||||||||||||||||||||||||||||||||||*/
+
+@init
+/*||||||||||||||||||||||||||||||||||||||*/
+GUI_RENDER_GRID_BACKGROUND = 1;
+GUI_RENDER_SUBGRID_BACKGROUND = 1;
+GUI_RENDER_FRAME = 1;
+GUI_RENDER_COMPONENTS = 1;
+GUI_RENDER_DEBUG_BORDERS = 0;
+THEME_COLORS_SHIFT_HOVER_HUE = 40;
+THEME_COLORS_SHIFT_FOREGROUND_HUE = 90;
+THEME_COLORS_SHIFT_LABEL_HUE = -70;
+THEME_COLORS_SHIFT_DISPLAY_HUE = -20;
+THEME_COLORS_MAIN_HUE = 268;
+THEME_COLORS_MAIN_SAT = 0.42;
+THEME_COLORS_MAIN_LUM = 0.24;
+THEME_COLORS_SUB_HUE = 269;
+THEME_COLORS_SUB_SAT = 0.38;
+THEME_COLORS_SUB_SAT_DIM = THEME_COLORS_SUB_SAT * 0.90;
+THEME_COLORS_SUB_LUM = 0.26;
+THEME_COLORS_SUB_LUM_DIM = THEME_COLORS_SUB_LUM * 0.90;
+THEME_COLORS_SUB_HUE_FG = THEME_COLORS_MAIN_HUE + THEME_COLORS_SHIFT_FOREGROUND_HUE;
+THEME_COLORS_SUB_HUE_HOVER = THEME_COLORS_SUB_HUE + THEME_COLORS_SHIFT_FOREGROUND_HUE;
+THEME_COLORS_SUB_HUE_LABEL = THEME_COLORS_SUB_HUE + THEME_COLORS_SHIFT_LABEL_HUE;
+THEME_COLORS_DISPLAY_HUE = THEME_COLORS_SUB_HUE + THEME_COLORS_SHIFT_DISPLAY_HUE;
+THEME_COLORS_DISPLAY_SAT = 0.5;
+THEME_COLORS_DISPLAY_LUM = 0.5;
+THEME_PADDING_MAIN_LEFT = 7;
+THEME_PADDING_MAIN_RIGHT = 7;
+THEME_PADDING_MAIN_TOP = 7;
+THEME_PADDING_MAIN_BOTTOM = 7;
+THEME_PADDING_SUB = 7;
+THEME_FRAME_LEFT = 6;
+THEME_FRAME_RIGHT = 6;
+THEME_FRAME_TOP = 6;
+THEME_FRAME_BOTTOM = 6;
+BUFFERS_MAX = 100;
+GFX_BUFFERS_MAX = 1000;
+GFX_BUFFER_SIZE = 11;
+UI_BUFFER_SIZE = 25;
+GONIOMETER_BUFFER_SIZE = 2048;
+UI_BUFFER_ADDR_BASE = 16384*10;
+UI_BUFFER_ADDR_MAIN = UI_BUFFER_ADDR_BASE;
+UI_BUFFER_ADDR_SUB = UI_BUFFER_ADDR_BASE + UI_BUFFER_SIZE;
+GFX_BUFFER_ADDR_BASE = UI_BUFFER_ADDR_BASE + UI_BUFFER_SIZE * 4;
+GFX_OFF_SCREEN_ADDR_BASE = GFX_BUFFER_ADDR_BASE + GFX_BUFFERS_MAX * GFX_BUFFER_SIZE;
+GONIOMETER_BUFFER_ADDR_BASE = GFX_OFF_SCREEN_ADDR_BASE + GFX_BUFFERS_MAX * GFX_BUFFER_SIZE;
+GONIOMETER_BUFFER_ADDR_X = GONIOMETER_BUFFER_ADDR_BASE;
+GONIOMETER_BUFFER_ADDR_Y = GONIOMETER_BUFFER_ADDR_X + GONIOMETER_BUFFER_SIZE * 2 + 2;
+BUFFER_ADDR_BASE = GONIOMETER_BUFFER_ADDR_Y + GONIOMETER_BUFFER_SIZE * 2 + 2;
+BUFFER_ADDR_HEADERS = BUFFER_ADDR_BASE;
+BUFFER_ADDR_ADDRESSES = BUFFER_ADDR_BASE + BUFFERS_MAX;
+BUFFER_ADDR_DATA = BUFFER_ADDR_BASE + BUFFERS_MAX * 2;
+
+function status()
+(
+	this.status_last = 0;
+	this.status_changed = 0;
+	this.samples_played = 0;
+);
+ST.status();
+PI = $pi;
+TWO_PI = $pi*2;
+FOUR_PI = $pi*4;
+TENTH_PI = $pi/10;
+COS_OF_ONE = cos(1);
+SIN_OF_ONE = sin(1);
+TWELFTH_ROOT_OF_TWO = 2^(1/12);
+TUNING = 440;
+phi = 1.6803398875;
+phi2 = 1.6803398875+1.6803398875;
+phi4 = phi2+phi2;
+half_pi = $pi/2;
+one_and_a_half_pi = $pi*1.5;
+pi2 = 2 * $pi;
+
+function clamp(x xMin xMax)
+(
+	min(xMax,max(xMin,x));
+);
+
+function fmod(x y)
+local(xy)
+(
+	xy = x/y;
+	abs(floor(xy) - xy)*2;
+);
+
+function range(min max)
+(
+	min < 0 && max > 0 ? abs(min)+abs(max) : max(abs(max), abs(min)) - min(abs(max), abs(min));
+);
+
+function normalize(val min max)
+local(range)
+(
+	range = range(min, max);
+	val/range - min/range;
+);
+
+function denormalize(val min max)
+(
+	val * range(min, max) + min;
+);
+
+function zeroCrossing(min max)
+(
+	-min / range(min, max);
+);
+
+function round(val)
+(
+	floor(val + 0.5);
+);
+
+function round(val stepsize)
+(
+	round(val/stepsize)*stepsize;
+);
+
+function snapNormalizedToEdge(val snapDistance)
+local(minSnap maxSnap)
+(
+	minSnap = snapDistance;
+	maxSnap = 1 - snapDistance;
+	val <= minSnap ? ( val = 0; );
+	val >= maxSnap ? ( val = 1; );
+	val;
+);
+
+function snapXToPixels(x)
+(
+	x|0 + snapNormalizedToEdge(x-floor(x), 0.02);
+);
+
+function snapYToPixels(y)
+(
+	y|0 + snapNormalizedToEdge(y-floor(y), 0.02);
+);
+
+function snapWidthToPixels(w)
+(
+	w|0 + snapNormalizedToEdge(w-floor(w), 0.02);
+);
+
+function snapHeightToPixels(h)
+(
+	h|0 + snapNormalizedToEdge(h-floor(h), 0.02) + 1;
+);
+
+function str_format(fmt p_a)
+local(str)
+(
+	str = #;
+	sprintf(str, fmt, p_a);
+	str;
+);
+
+function str_format(fmt p_a p_b)
+local(str)
+(
+	str = #;
+	sprintf(str, fmt, p_a, p_b);
+	str;
+);
+
+function mouseInArea(x y w h)
+(
+	mouse_y >= y && mouse_y <= (y+h) && (mouse_x >= x && mouse_x <= (x+w));
+);
+
+function mouseClickIn(x y w h)
+(
+	mouse_cap == 1 && mouseInArea(x,y,w,h);
+);
+
+function mouseALTClickIn(x y w h)
+(
+	mouse_cap == 17 && mouseInArea(x,y,w,h);
+);
+
+function mouseWheelIn(x y w h)
+(
+	mouse_wheel != 0 && mouseInArea(x,y,w,h);
+);
+
+function hsla(h s l a)
+local(m c x r g b quadrant)
+(
+	h < 0 ?
+	(
+		h = h + ceil(-h / 360) * 360;
+	) :
+	(
+		h > 360 ?
+		(
+			h = h - floor(h / 360) * 360;
+		);
+	);
+	h == 0 ? h = 360;
+	m = l - (c / 2);
+	c = (1 - abs(2 * s - 1)) * s;
+	x = c * (1 - abs(fmod((h / 60), 2) - 1));
+	r = 0; g = 0; b = 0;
+	quadrant = ceil(h / 60);
+	quadrant == 1 ? ( r = c; g = x; b = 0; );
+	quadrant == 2 ? ( r = x; g = c; b = 0; );
+	quadrant == 3 ? ( r = 0; g = c; b = x; );
+	quadrant == 4 ? ( r = 0; g = x; b = c; );
+	quadrant == 5 ? ( r = x; g = 0; b = c; );
+	quadrant == 6 ? ( r = c; g = 0; b = x; );
+	gfx_r = r + m;
+	gfx_g = g + m;
+	gfx_b = b + m;
+	gfx_a = a;
+);
+
+function blurArea(x y w h n)
+(
+	loop(n,
+		gfx_x = x;
+		gfx_y = y;
+		gfx_blurto(gfx_x+w, gfx_y+h);
+	);
+);
+
+function drawString(x y str)
+(
+	gfx_x = x;
+	gfx_y = y;
+	gfx_drawstr(str);
+);
+
+function drawStringOutlined(x y str hue sat lum a)
+(
+	hsla(hue,0,0.01,a/2);
+	drawString(x-1, y, str);
+	drawString(x+1, y, str);
+	drawString(x, y-1, str);
+	drawString(x, y+1, str);
+	drawString(x-1, y-1, str);
+	drawString(x+1, y-1, str);
+	drawString(x-1, y+1, str);
+	drawString(x+1, y+1, str);
+	hsla(hue,sat,lum,a);
+	drawString(x, y, str);
+);
+
+function drawStringLeft(x y w h str hue sat lum a)
+(
+	gfx_measurestr(str, str_w, str_h);
+	drawStringOutlined( x,
+	y + h / 2 - str_h / 2,
+	str,
+	hue,
+	sat,
+	lum,
+	a);
+);
+
+function drawStringRight(x y w h str hue sat lum a)
+(
+	gfx_measurestr(str, str_w, str_h);
+	drawStringOutlined( x + w - str_w,
+	y + h / 2 - str_h / 2,
+	str,
+	hue,
+	sat,
+	lum,
+	a);
+);
+
+function drawStringCentered(x y w h str hue sat lum a)
+(
+	gfx_measurestr(str, str_w, str_h);
+	drawStringOutlined( x + w / 2 - str_w / 2,
+	y + h / 2 - str_h / 2,
+	str,
+	hue,
+	sat,
+	lum,
+	a);
+);
+
+function formatNumber(num precision unit maxLen)
+local(str format)
+(
+	str = #;
+	format = #;
+	precision > 0 ? sprintf(format, "%%.%d%s%%s", precision, "f")
+	: sprintf(format, "%%%d%s%%s", precision, "d");
+	sprintf(str, format, num, unit);
+	sprintf(format, "%%%ds", maxLen);
+	sprintf(str, format, str);
+	str;
+);
+
+function showToolTip(x y w h str)
+local(strW strH bx by bw bh)
+(
+	mouse_y >= y && mouse_y <= (y+h) && (mouse_x >= x && mouse_x <= (x+w)) ?
+	(
+		strW = 0;
+		strH = 0;
+		gfx_measurestr(str, strW, strH);
+		bx = mouse_x + 10;
+		by = mouse_y - strH - 15;
+		bw = strW + 5;
+		bh = strH + 5;
+		bx < x ? bx = x;
+		by < y ? by = y;
+		bx + bw >= x+w ? bx = x+w-bw;
+		by + bh >= y+h ? by = y+h-bh;
+		blurArea(bx, by, bw, bh, 16);
+		gfx_r = 0; gfx_g = 0; gfx_b = 0; gfx_a = 0.5;
+		gfx_rect(bx, by, bw, bh);
+		gfx_r = 1; gfx_g = 1; gfx_b = 1; gfx_a = 1;
+		gfx_rect(bx-1, by-1, bw+2, bh+2, -1);
+		drawString(bx+2.5, by+2.5, str);
+	);
+);
+
+function blit_prepare_display(hue sat lum alpha)
+local(last_h last_s last_l last_a)
+(
+	last_h != hue || last_s != sat || last_l != lum || last_a != alpha ?
+	(
+		gfx_dest = 50;
+		gfx_setimgdim(50, 2, 2);
+		gfx_r = gfx_g = gfx_b = 0; gfx_a = 1;
+		gfx_rect(0, 0, 2, 2);
+		hsla(hue, sat, lum, alpha);
+		gfx_x = 0; gfx_y = 0;
+		gfx_setpixel(gfx_r, gfx_g, gfx_b);
+		hsla(hue, sat, lum*0.5, alpha);
+		gfx_x = 1; gfx_y = 1;
+		gfx_setpixel(gfx_r, gfx_g, gfx_b);
+		hsla(hue, sat, lum*(2/3), alpha);
+		gfx_x = 1; gfx_y = 0;
+		gfx_setpixel(gfx_r, gfx_g, gfx_b);
+		gfx_x = 0; gfx_y = 1;
+		gfx_setpixel(gfx_r, gfx_g, gfx_b);
+		gfx_dest = -1;
+		last_h = hue;
+		last_s = sat;
+		last_l = lum;
+		last_a = alpha;
+	);
+);
+
+function blit_tiled_display(x y w h hue sat lum alpha)
+local(coordinatelist l m xpos ypos last_x last_y last_w last_h)
+(
+	last_x != x || last_y != y || last_w != w || last_h != h ?
+	(
+		blit_prepare_display(hue, sat, lum, alpha);
+		x = ceil(x);
+		y = ceil(y);
+		coordinatelist=GFX_BUFFER_ADDR_BASE;
+		coordinatelist[0]=0;
+		coordinatelist[1]=0;
+		coordinatelist[2]=2;
+		coordinatelist[3]=2;
+		coordinatelist[6]=2;
+		coordinatelist[7]=2;
+		coordinatelist[8]=0;
+		coordinatelist[9]=0;
+		l = floor(w);
+		m = floor(h);
+		i = 0;
+		__n_i = ceil((l-0)/2);
+		loop (__n_i,
+			j = 0;
+			__n_j = ceil((m-0)/2);
+			loop (__n_j,
+				xpos = x+i;
+				ypos = y+j;
+				coordinatelist[4]= xpos - xpos % 2;
+				coordinatelist[5]= ypos - ypos % 2;
+				gfx_blitext(50, coordinatelist, 0);
+				j += 2;
+			);
+			i += 2;
+		);
+		last_x = x;
+		last_y = y;
+		last_w = w;
+		last_h = h;
+	);
+);
+
+function blit_border(ix iy iw ih)
+(
+	gfx_r = 1; gfx_g = 0; gfx_b = 0; gfx_a = 0.125;
+	gfx_rect(ix, iy, iw, ih, 0);
+	gfx_r = 1; gfx_g = 1; gfx_b = 1; gfx_a = 0.5;
+	gfx_rect(ix, iy, iw, ih, 0);
+	gfx_r = 0; gfx_g = 0; gfx_b = 0; gfx_a = 1;
+	gfx_rect(ix-1, iy-1, iw+2, ih+2, 0);
+);
+
+function blit_border(ix iy iw ih hue sat lum)
+(
+	hsla(hue,0,0,0.125);
+	gfx_rect(ix, iy, iw, ih, 0);
+	hsla(hue,sat,lum,1);
+	gfx_rect(ix, iy, iw, ih, 0);
+	hsla(hue,sat,lum/8,1);
+	gfx_rect(ix-1, iy-1, iw+2, ih+2, 0);
+);
+
+function blit_debug_border(ix iy iw ih hue thicknessLeft thicknessRight thicknessTop thicknessBottom)
+(
+	GUI_RENDER_DEBUG_BORDERS == 1 ? (
+		hsla(hue,0.5,0.5,1);
+		gfx_rect(ix, iy, iw, thicknessTop);
+		gfx_rect(ix, iy + ih - thicknessBottom, iw, thicknessBottom);
+		gfx_rect(ix, iy, thicknessLeft, ih);
+		gfx_rect(ix + iw - thicknessRight, iy, thicknessRight, ih);
+	);
+);
+
+function blit_debug_border(ix iy iw ih hue thickness)
+(
+	blit_debug_border(ix, iy, iw, ih, hue, thickness, thickness, thickness, thickness);
+);
+
+function layout()
+(
+	this.address = UI_BUFFER_ADDR_BASE;
+	this.main = UI_BUFFER_ADDR_MAIN;
+	this.sub = UI_BUFFER_ADDR_SUB;
+	this.status.status();
+);
+
+function layout_subgrid_select(c r col_span row_span)
+local(x y w h bx by bw bh)
+(
+	x = this.main_x + THEME_PADDING_MAIN_LEFT;
+	y = this.main_y + THEME_PADDING_MAIN_TOP;
+	w = this.main_w - THEME_PADDING_MAIN_LEFT - THEME_PADDING_MAIN_RIGHT;
+	h = this.main_h - THEME_PADDING_MAIN_TOP - THEME_PADDING_MAIN_BOTTOM;
+	bx = (w / this.sub_cols) * c;
+	by = (h / this.sub_rows) * r;
+	bw = w / this.sub_cols;
+	bh = h / this.sub_rows;
+	(col_span > 1) ? bw *= col_span;
+	(row_span > 1) ? bh *= row_span;
+	bx += THEME_PADDING_SUB / 2;
+	bw -= THEME_PADDING_SUB;
+	by += THEME_PADDING_SUB / 2;
+	bh -= THEME_PADDING_SUB;
+	bx += x;
+	by += y;
+	this.sub.selection.x = snapXToPixels(bx);
+	this.sub.selection.y = snapYToPixels(by);
+	this.sub.selection.h = snapWidthToPixels(bh);
+	this.sub.selection.w = snapHeightToPixels(bw);
+	blit_debug_border(
+		bx,by,bw,bh,
+		30+(r+c)*2,
+		2
+	);
+);
+
+function layout_grid_select(c r cols rows)
+(
+	this.main.selection.w = snapXToPixels(this.main_w - THEME_PADDING_MAIN_LEFT - THEME_PADDING_MAIN_RIGHT);
+	this.main.selection.h = snapYToPixels(this.main_h - THEME_PADDING_MAIN_TOP - THEME_PADDING_MAIN_BOTTOM);
+	this.main.selection.x = snapWidthToPixels((this.main.selection.w / this.main_cols) * c + THEME_PADDING_MAIN_LEFT);
+	this.main.selection.y = snapHeightToPixels((this.main.selection.h / this.main_crows) * r + THEME_PADDING_MAIN_TOP);
+);
+
+function layout_grid(x y w h cols rows)
+(
+	this.main = this.address;
+	this.main_subgrids = 0;
+	this.main_x = x;
+	this.main_y = y;
+	this.main_w = w;
+	this.main_h = h;
+	this.main_cols = cols;
+	this.main_rows = rows;
+	this.layout_grid_select(0, 0, cols, rows);
+);
+
+function layout_subgrid(s_cols s_rows)
+(
+	this.sub = this.address + 25 + this.main_subgrids * 25;
+	this.main_subgrids += 1;
+	this.sub_cols = s_cols;
+	this.sub_rows = s_rows;
+	this.layout_subgrid_select(0, 0, s_cols, s_rows);
+);
+
+function layout_hover()
+(
+	mouseInArea(this.sub.selection.x, this.sub.selection.y, this.sub.selection.w, this.sub.selection.h);
+);
+
+function layout_click()
+(
+	mouseClickIn(this.sub.selection.x, this.sub.selection.y, this.sub.selection.w, this.sub.selection.h);
+);
+
+function layout_hover(sub_x sub_y div_x div_y)
+(
+	mouseInArea(ceil(this.sub.selection.x+sub_x*floor(this.sub.selection.w/div_x))+1,
+	ceil(this.sub.selection.y+sub_y*floor(this.sub.selection.h/div_y))+1,
+	floor(this.sub.selection.w/div_x)-2, floor(this.sub.selection.h/div_y)-2);
+);
+
+function layout_click(sub_x sub_y div_x div_y)
+(
+	mouseClickIn(ceil(this.sub.selection.x+sub_x*floor(this.sub.selection.w/div_x))+1,
+	ceil(this.sub.selection.y+sub_y*floor(this.sub.selection.h/div_y))+1,
+	floor(this.sub.selection.w/div_x)-2, floor(this.sub.selection.h/div_y)-2);
+);
+
+function layout_alt_click()
+(
+	mouseALTClickIn(this.sub.selection.x, this.sub.selection.y, this.sub.selection.w, this.sub.selection.h);
+);
+
+function layout_wheel()
+(
+	mouseWheelIn(this.sub.selection.x, this.sub.selection.y, this.sub.selection.w, this.sub.selection.h);
+);
+
+function layout_slider_mouse_events(sliderN minVal maxVal defVal stepSize)
+(
+	this.layout_click() == 1 ?
+	(
+		slider(sliderN) = round(denormalize((mouse_x - this.sub.selection.x) / this.sub.selection.w, minVal, maxVal), stepSize);
+		this.needs_update = 1;
+	);
+	this.layout_alt_click() == 1 ?
+	(
+		slider(sliderN) = defVal;
+		this.needs_update = 1;
+	);
+	this.layout_wheel() == 1 ?
+	(
+		slider(sliderN) += (mouse_wheel/120) * stepSize;
+		slider(sliderN) = clamp(round(slider(sliderN), stepSize), minVal, maxVal);
+		this.needs_update = 1;
+		mouse_wheel = 0;
+	);
+);
+
+function layout_grid_background()
+(
+	GUI_RENDER_GRID_BACKGROUND == 1 ?
+	(
+		gfx_a = 1;
+		blit_tiled_display(this.main_x, this.main_y, this.main_w, this.main_h, THEME_COLORS_MAIN_HUE, THEME_COLORS_MAIN_SAT, THEME_COLORS_MAIN_LUM, 1);
+	);
+);
+
+function layout_subgrid_background()
+(
+	GUI_RENDER_SUBGRID_BACKGROUND == 1 ?
+	(
+		gfx_a = 1;
+		blit_tiled_display(this.sub.selection.x, this.sub.selection.y, this.sub.selection.w, this.sub.selection.h, THEME_COLORS_DISPLAY_HUE, THEME_COLORS_SUB_SAT, THEME_COLORS_SUB_LUM, 1);
+	);
+);
+
+function layout_subgrid_background_transparent()
+(
+	GUI_RENDER_SUBGRID_BACKGROUND == 1 ?
+	(
+		gfx_a = 0;
+		blit_tiled_display(this.sub.selection.x, this.sub.selection.y, this.sub.selection.w, this.sub.selection.h, THEME_COLORS_DISPLAY_HUE, THEME_COLORS_SUB_SAT, THEME_COLORS_SUB_LUM, 0);
+		gfx_a = 1;
+	);
+);
+
+function layout_label(str c r cols rows alpha)
+(
+	this.layout_subgrid_select(c, r, cols, rows);
+	GUI_RENDER_COMPONENTS == 1 ?
+	(
+		drawStringCentered(this.sub.selection.x, this.sub.selection.y, this.sub.selection.w, this.sub.selection.h, str, THEME_COLORS_SUB_HUE_LABEL, THEME_COLORS_SUB_SAT+0.5, THEME_COLORS_SUB_LUM_DIM, alpha);
+	);
+);
+
+function layout_label(str hue sat lum c r cols rows alpha)
+(
+	this.layout_subgrid_select(c, r, cols, rows);
+	GUI_RENDER_COMPONENTS == 1 ?
+	(
+		drawStringCentered(this.sub.selection.x, this.sub.selection.y, this.sub.selection.w, this.sub.selection.h, str, hue, sat, lum, alpha);
+	);
+);
+
+function layout_slider(sliderN minVal maxVal defVal stepSize divisions title scale precision unit c r cols rows)
+local(ix iy iw ih sx sy valNorm start_pos dx zcrossx dw dh zero_cross div_size idiv dpos str val)
+(
+	this.layout_subgrid_select(c, r, cols, rows);
+	this.layout_subgrid_background();
+	GUI_RENDER_COMPONENTS == 1 ?
+	(
+		this.needs_update = 0;
+		ix = this.sub.selection.x;
+		iy = this.sub.selection.y;
+		iw = this.sub.selection.w;
+		ih = this.sub.selection.h;
+		sx = ix;
+		sy = iy;
+		valNorm = normalize(slider(sliderN), minVal, maxVal);
+		start_pos = minVal < 0 ? (maxVal > 0 ? "center" : "right") : "left";
+		start_pos == "left" ?
+		(
+			sx = ix;
+			dx = ix + valNorm * iw;
+		) :
+		(
+			start_pos == "right" ?
+			(
+				sx = ix + iw;
+				dx = ix + (iw - (1-valNorm) * iw);
+			) :
+			(
+				zcrossx = ix + zeroCrossing(minVal, maxVal) * iw;
+				sx = zcrossx;
+				dx = ix + valNorm * iw;
+			)
+		);
+		sx > dx ? atomic_exch(sx, dx);
+		dw = dx - sx;
+		dh = ih;
+		zero_cross = zeroCrossing(minVal, maxVal);
+		div_size = iw/divisions;
+		start_pos == "center" ? (
+			dw += sx-floor(sx);
+			dw = ceil(dw);
+		);
+		blit_tiled_display(sx, sy, dw-1, dh, THEME_COLORS_SUB_HUE_FG+(this.layout_hover()*THEME_COLORS_SHIFT_HOVER_HUE), THEME_COLORS_SUB_SAT_DIM, THEME_COLORS_SUB_LUM_DIM, 1);
+		hsla(THEME_COLORS_SUB_HUE, 0.5, 0.5, 0.35);
+		idiv = 0;
+		while (idiv < divisions)
+		(
+			dpos = ix + (idiv + (start_pos == "center" ? zero_cross + 0.5 : 0)) * div_size;
+			dpos >= ix && dpos <= ix+iw ? gfx_line(dpos, iy, dpos, iy+ih);
+			idiv += 1;
+		);
+		start_pos == "center" ?
+		(
+			dpos = zcrossx + (sx < zcrossx ? -dw : dw);
+		) :
+		(
+			dpos = ix + dw;
+		);
+		dpos < ix + 2 ? ( dpos = ix + 2; );
+		dpos > ix + iw - 2 ? ( dpos = ix + iw - 2; );
+		hsla(THEME_COLORS_SUB_HUE_FG, 0.5, 0.5 ,0.5);
+		gfx_line(dpos-1, iy, dpos-1, iy + ih);
+		gfx_line(dpos+1, iy, dpos+1, iy + ih);
+		hsla(THEME_COLORS_SUB_HUE_FG, 0.5, 0.5 ,0.75);
+		gfx_line(dpos, iy, dpos, iy + ih);
+		str = #;
+		val = (valNorm-zero_cross);
+		start_pos == "right" ?
+		(
+			val = (1-val)-zero_cross;
+		) :
+		(
+			start_pos == "left" ?
+			(
+				val = val+zero_cross;
+			) :
+			(
+				val < 0 ?
+				(
+					val = -(1-valNorm/zero_cross);
+				) :
+				(
+					val = (valNorm-zero_cross)/(1-zero_cross);
+				);
+			);
+		);
+		val *= scale;
+		sprintf(str, "%s: %s", title, formatNumber(val, precision, unit, 0));
+		drawStringCentered(this.sub.selection.x, this.sub.selection.y, this.sub.selection.w, this.sub.selection.h, str, THEME_COLORS_SUB_HUE_LABEL, THEME_COLORS_SUB_SAT_DIM, 0.7, 0.9);
+		this.layout_slider_mouse_events(sliderN, minVal, maxVal, defVal, stepSize);
+		blit_border(ix, iy, iw, ih);
+		this.needs_update = 1;
+	);
+);
+
+function layout_ledtoggle_square(sliderN title c r cols rows)
+local(ix iy iw ih sx sy dh isOn lri str)
+(
+	this.layout_subgrid_select(c, r, cols, rows);
+	this.layout_subgrid_background_transparent();
+	GUI_RENDER_COMPONENTS == 1 ?
+	(
+		this.needs_update = 0;
+		ix = this.sub.selection.x;
+		iy = this.sub.selection.y;
+		iw = this.sub.selection.w;
+		ih = this.sub.selection.h;
+		sx = ix + iw / 2 - (ih / 2);
+		sy = iy;
+		ih > iw ? atomic_exch(ih, iw);
+		dh = ih;
+		isOn = slider(sliderN);
+		blit_tiled_display(sx+1, sy, dh, dh, THEME_COLORS_SUB_HUE_FG + 180 + (this.layout_hover() * (THEME_COLORS_SHIFT_HOVER_HUE - 180)), THEME_COLORS_SUB_SAT_DIM, THEME_COLORS_SUB_LUM * isOn, 1);
+		isOn && this.layout_hover() == 0 ? (
+			lri = dh;
+			loop (lri,
+				lri % 4 == 0 ? (
+					gfx_x = sx+2; gfx_y = sy+2;
+					gfx_blurto(sx+dh-2, sy+dh-2);
+				);
+				hsla(THEME_COLORS_SUB_HUE_FG + (isOn * 180), THEME_COLORS_SUB_SAT_DIM * (0.25 + isOn * 0.75) * 1.15, THEME_COLORS_SUB_LUM_DIM * 0.75, (lri/dh) * 0.2);
+				gfx_circle(ix + iw / 2 - 1, iy + ih / 2 - 1, (dh - lri) / 2, 1);
+				lri -= 1;
+			);
+		);
+		hsla(THEME_COLORS_SUB_HUE_FG + (isOn * 180), THEME_COLORS_SUB_SAT_DIM * (0.25 + isOn * 0.75), THEME_COLORS_SUB_LUM_DIM, 0.75);
+		blit_border(sx, sy, dh, dh);
+		this.layout_hover() ? (
+			str = #;
+			sprintf(str, isOn ? "%s: On" : "%s: Off", title);
+			showToolTip(mouse_x, mouse_y - 10, 100, 20, str);
+		);
+		this.layout_click() ?
+		(
+			this.led_toggle_wait <= 0 ? (
+				slider(sliderN) = slider(sliderN) == 1 ? 0 : 1;
+				this.needs_update = 1;
+				this.led_toggle_wait = 1;
+			) : (
+			this.led_toggle_wait = this.led_toggle_wait - 1;
+		)
+	);
+);
+);
+
+function layout_title(title c r cols rows)
+local(ix iy iw ih label)
+(
+	this.layout_subgrid_select(c, r, cols, rows);
+	this.layout_subgrid_background();
+	GUI_RENDER_COMPONENTS == 1 ?
+	(
+		ix = this.sub.selection.x;
+		iy = this.sub.selection.y;
+		iw = this.sub.selection.w;
+		ih = this.sub.selection.h;
+		gfx_r = 0; gfx_g = 0; gfx_b = 0; gfx_a = 0.25;
+		gfx_setfont(1, "SansSerif", gfx_texth*2, 'b');
+		label = #;
+		sprintf(label, "%s", title);
+		gfx_measurestr(label, w, h);
+		drawStringOutlined(ix+iw/2-w/2, iy+ih/2-h/2, label, 400, 0.66, 0.75, 0.7);
+		gfx_setfont(0);
+	);
+);
+
+function layout_combobutton(sliderN title total c r cols rows)
+local(ix iy iw ih hvr cx val hasNeighbors selectedTitle maxChars selectedTitleShort ll lr mouse_timer)
+(
+	this.layout_subgrid_select(c, r, cols, rows);
+	this.layout_subgrid_background();
+	GUI_RENDER_COMPONENTS == 1 ?
+	(
+		this.needs_update = 0;
+		ix = this.sub.selection.x;
+		iy = this.sub.selection.y;
+		iw = this.sub.selection.w;
+		ih = this.sub.selection.h;
+		hvr = this.layout_hover();
+		cx = iw/2;
+		val = slider(sliderN);
+		hasNeighbors = val > 0 && val < total-1;
+		blit_tiled_display(ix+1, iy, iw, ih, THEME_COLORS_SUB_HUE_FG-180+(hvr*THEME_COLORS_SHIFT_HOVER_HUE), THEME_COLORS_SUB_SAT_DIM, THEME_COLORS_SUB_LUM_DIM, 1);
+		selectedTitle = #;
+		maxChars = max(1, iw / gfx_texth - 3);
+		strcpy_fromslider(selectedTitle, slider(sliderN));
+		selectedTitleShort = str_format(str_format("%%.%ds", maxChars), selectedTitle);
+		ll = 0;
+		lr = 0;
+		hasNeighbors ? (
+			ll = lr = 1;
+		) : (
+		val == 0 ? (
+			lr = 1;
+		) : (
+		ll = 1;
+	);
+);
+drawStringRight(ix - 5, iy, iw, ih, ">", THEME_COLORS_SUB_HUE_LABEL+hvr*-90, THEME_COLORS_SUB_SAT_DIM, 0.7, 0.3 + 0.3 * lr);
+drawStringLeft(ix + 5, iy, iw, ih, "<", THEME_COLORS_SUB_HUE_LABEL+hvr*-90, THEME_COLORS_SUB_SAT_DIM, 0.7, 0.3 + 0.3 * ll);
+this.layout_label(selectedTitleShort, THEME_COLORS_SUB_HUE_LABEL, THEME_COLORS_SUB_SAT_DIM, 0.7, c, r, cols, rows, 0.9);
+this.layout_subgrid_select(c, r, cols, rows);
+blit_border(ix, iy, iw, ih);
+hvr && strlen(selectedTitleShort) < strlen(selectedTitle) ?
+(
+	showToolTip(mouse_x, mouse_y - 10, 100, 20, str_format("%s:\n%s", title, selectedTitle));
+);
+this.layout_click() && mouse_timer <= 0 ?
+(
+	mouse_timer = 5;
+	val += 1;
+	val >= total ? val = 0;
+	slider(sliderN) = val;
+	mouse_cap = 0;
+	this.needs_update = 1;
+);
+mouse_timer -= 1;
+this.layout_wheel() ?
+(
+	val += mouse_wheel > 0 ? 1 : (mouse_wheel < 0 ? -1 : 0);
+	val < 0 ? val = 0;
+	val >= total ? val = total - 1;
+	slider(sliderN) = val;
+	mouse_wheel = 0;
+	this.needs_update = 1;
+);
+);
+);
+
+function layout_combolabel(sliderN title total c r cols rows)
+local(ix iy iw ih hvr hvr_col val selectedTitle maxChars selectedTitleShort ll lr mouse_timer)
+(
+	this.layout_subgrid_select(c, r, cols, rows);
+	this.layout_subgrid_background_transparent();
+	GUI_RENDER_COMPONENTS == 1 ?
+	(
+		this.needs_update = 0;
+		ix = this.sub.selection.x;
+		iy = this.sub.selection.y;
+		iw = this.sub.selection.w;
+		ih = this.sub.selection.h;
+		hvr = this.layout_hover();
+		hvr_col = THEME_COLORS_SUB_HUE_LABEL+hvr*-90;
+		val = slider(sliderN);
+		selectedTitle = #;
+		maxChars = max(1, iw / gfx_texth - 3);
+		strcpy_fromslider(selectedTitle, slider(sliderN));
+		selectedTitleShort = str_format(str_format("%%.%ds", maxChars), selectedTitle);
+		ll = 0;
+		lr = 0;
+		val > 0 && val < total-1 ? (
+			ll = lr = 1;
+		) : (
+		val == 0 ? (
+			lr = 1;
+		) : (
+		ll = 1;
+	);
+);
+drawStringRight(ix - 5 + iw / 2, iy, iw / 2, ih, ">", hvr_col, THEME_COLORS_SUB_SAT_DIM, 0.7, 0.3 + 0.3 * lr);
+drawStringLeft( ix + 5, iy, iw / 2, ih, "<", hvr_col, THEME_COLORS_SUB_SAT_DIM, 0.7, 0.3 + 0.3 * ll);
+this.layout_label(selectedTitleShort, THEME_COLORS_SUB_HUE_LABEL, THEME_COLORS_SUB_SAT_DIM, 0.7, c, r, cols, rows, 0.9);
+this.layout_subgrid_select(c, r, cols, rows);
+hvr && strlen(selectedTitleShort) < strlen(selectedTitle) ?
+(
+	showToolTip(mouse_x, mouse_y - 10, 100, 20, str_format("%s:\n%s", title, selectedTitle));
+);
+this.layout_click() && mouse_timer <= 0 ?
+(
+	mouse_timer = 9;
+	val += 1;
+	val >= total ? val = 0;
+	slider(sliderN) = val;
+	mouse_cap = 0;
+	this.needs_update = 1;
+);
+mouse_timer -= 1;
+this.layout_wheel() ?
+(
+	val += mouse_wheel > 0 ? 1 : (mouse_wheel < 0 ? -1 : 0);
+	val < 0 ? val = 0;
+	val >= total ? val = total - 1;
+	slider(sliderN) = val;
+	mouse_wheel = 0;
+	this.needs_update = 1;
+);
+);
+);
+
+function layout_frame()
+(
+	GUI_RENDER_FRAME == 1 ?
+	(
+		gfx_a = 0.25;
+		gfx_r = 0;
+		gfx_g = 0;
+		gfx_b = 0;
+		gfx_rect(this.main_x, this.main_y, THEME_FRAME_LEFT, this.main_h);
+		gfx_rect(this.main_x + this.main_w - THEME_FRAME_RIGHT, this.main_y, THEME_FRAME_RIGHT, this.main_h);
+		gfx_rect(this.main_x + THEME_FRAME_LEFT, this.main_y, this.main_w - THEME_FRAME_RIGHT - THEME_FRAME_LEFT, THEME_FRAME_TOP);
+		gfx_rect(this.main_x + THEME_FRAME_LEFT, this.main_y + this.main_h - THEME_FRAME_BOTTOM, this.main_w - THEME_FRAME_RIGHT - THEME_FRAME_LEFT, THEME_FRAME_BOTTOM);
+		gfx_a = 1;
+		blit_border(this.main_x+1, this.main_y+1, this.main_w-2, this.main_h-2, THEME_COLORS_MAIN_HUE, THEME_COLORS_MAIN_SAT, THEME_COLORS_MAIN_LUM);
+	);
+);
+ui.layout();
+ST.status();
+
+function buffer_manager()
+(
+	this.header_addresses = BUFFER_ADDR_HEADERS;
+	this.header_lengths = BUFFER_ADDR_ADDRESSES;
+	this.data_start = BUFFER_ADDR_DATA;
+	this.data_size = 0;
+	this.buffers_in_use = -1;
+	this.buffers_max = BUFFERS_MAX;
+);
+
+function buffer_manager_address(id)
+(
+	this.header_addresses[id];
+);
+
+function buffer_manager_length(id)
+(
+	this.header_lengths[id];
+);
+
+function buffer_manager_size()
+local(l)
+(
+	l = this.buffers_in_use-1;
+	this.data_size = 0;
+	while (l >= 0)
+	(
+		this.data_size += this.header_lengths[l];
+		l -= 1;
+	);
+	this.data_size;
+);
+
+function buffer_manager_new(len)
+local(s addr)
+(
+	this.buffers_in_use += 1;
+	s = this.data_start;
+	s += this.buffer_manager_size();
+	this.__calc_addr = s;
+	this.header_lengths[this.buffers_in_use] = len;
+	this.header_addresses[this.buffers_in_use] = s;
+	addr = this.header_addresses[this.buffers_in_use];
+	len -= 1;
+	while (len >= 0)
+	(
+		addr[l] = 0;
+		l -= 1;
+	);
+	this.buffers_in_use;
+);
+BM.buffer_manager();
+
+function buffer(len)
+(
+	this.buffer = BM.buffer_manager_new(len);
+	this.address = BM.buffer_manager_address(this.buffer);
+	this.address_end = BM.buffer_manager_address(this.buffer) + len;
+	this.length = BM.buffer_manager_length(this.buffer);
+	this.length_init = BM.buffer_manager_length(this.buffer);
+	this.index = 0;
+	this.index_reverse = this.length - 1;
+);
+
+function MIDI_SysEx(manufacturer_id buffer_size)
+(
+	this.bufsize = buffer_size;
+	this.MIDI.buffer(buffer_size);
+	this.syx_i = 0;
+	this.syx_msgs = 0;
+	this.manufacturer_id = manufacturer_id;
+	this.msgs_sent = 0;
+	this.msgs_recv = 0;
+);
+
+function MIDI_SysEx_clear()
+(
+	this.syx_i = 0;
+	while (this.syx_i < this.bufsize) (
+		this.MIDI.address[this.syx_i] = 0;
+		this.syx_i += 1;
+	);
+	this.syx_i = 0;
+	this.syx_msgs = 0;
+	this.msgs_sent = 0;
+	this.msgs_recv = 0;
+);
+
+function MIDI_SysEx_write(val)
+(
+	this.MIDI.address[this.syx_i] = val;
+	this.syx_i += 1;
+);
+
+function MIDI_SysEx_write(val1 val2)
+(
+	this.MIDI_SysEx_write(val1);
+	this.MIDI_SysEx_write(val2);
+);
+
+function MIDI_SysEx_write(val1 val2 val3)
+(
+	this.MIDI_SysEx_write(val1);
+	this.MIDI_SysEx_write(val2);
+	this.MIDI_SysEx_write(val3);
+);
+
+function MIDI_SysEx_start()
+(
+	this.MIDI_SysEx_write(0xF0);
+	this.MIDI_SysEx_write(this.manufacturer_id);
+);
+
+function MIDI_SysEx_end()
+(
+	this.MIDI_SysEx_write(0xF7);
+	this.syx_msgs += 1;
+);
+
+function MIDI_SysEx_send()
+(
+	this.syx_msgs > 0 ? (
+		midisend_buf(0, this.MIDI.address, this.syx_i);
+		this.MIDI_SysEx_clear();
+		this.msgs_sent += 1;
+	);
+);
+
+function MIDI_SysEx_send(offset)
+(
+	this.syx_msgs > 0 ? (
+		midisend_buf(offset, this.MIDI.address, this.syx_i);
+		this.MIDI_SysEx_clear();
+		this.msgs_sent += 1;
+	);
+);
+gfx_clear = -1;
+ext_noinit = 1;
+dummy.buffer(1);
+seq_global_settings.buffer(0x0A);
+leds.buffer(0x0F);
+steps_enabled.buffer(0x0F);
+steps_notes.buffer(0x0F);
+note = 0x3C;
+sx.MIDI_SysEx(0x00, 2048);
+
+function send_command(v1, v2)
+(
+	sx.MIDI_SysEx_start();
+	sx.MIDI_SysEx_write(0x20, 0x6B);
+	sx.MIDI_SysEx_write(0x7F, 0x42);
+	sx.MIDI_SysEx_write(v1, v2);
+	sx.MIDI_SysEx_end();
+	sx.MIDI_SysEx_send();
+);
+
+function send_command(v1, v2, v3, v4)
+(
+	sx.MIDI_SysEx_start();
+	sx.MIDI_SysEx_write(0x20, 0x6B);
+	sx.MIDI_SysEx_write(0x7F, 0x42);
+	sx.MIDI_SysEx_write(v1, 0x00);
+	sx.MIDI_SysEx_write(v2, v3, v4);
+	sx.MIDI_SysEx_end();
+	sx.MIDI_SysEx_send();
+);
+
+function send_set_command(v1, v2, v3, v4)
+(
+	sx.MIDI_SysEx_start();
+	sx.MIDI_SysEx_write(0x02, 0x6B);
+	sx.MIDI_SysEx_write(0x7F, 0x42);
+	sx.MIDI_SysEx_write(v1, 0x00);
+	sx.MIDI_SysEx_write(v2, v3, v4);
+	sx.MIDI_SysEx_end();
+	sx.MIDI_SysEx_send();
+);
+
+function preset_store(preset_id)
+(
+	send_command(0x06, preset_id);
+);
+
+function preset_recall(preset_id)
+(
+	send_command(0x05, preset_id);
+);
+
+function step_set(index, note, on, force)
+(
+	changed = 0;
+	force == 1 || steps_enabled.address[index] != on ? (
+		send_command(0x02, 0x53, index, on == 1 ? 0x7F : 0x00);
+		steps_enabled.address[index] = on;
+		changed = 1;
+	);
+	force == 1 || steps_notes.address[index] != note ? (
+		send_command(0x02, 0x52, index, note);
+		steps_notes.address[index] = note;
+		changed = 1;
+	);
+	changed;
+);
+
+function seq_global_set(index, value, force)
+(
+	changed = 0;
+	force == 1 || seq_global_settings.address[index] != value ? (
+		send_command(0x02, 0x50, index, value);
+		seq_global_settings.address[index] = value;
+		changed = 1;
+	);
+	changed;
+);
+
+function seq_led(index, color, force)
+(
+	color == "off" ? ( color = 0x00; ) : (
+		color == "red" ? ( color = 0x01; ) : (
+			color == "blue" ? ( color = 0x10; ) : (
+				color == "magenta" ? ( color = 0x11; )
+			)
+		)
+	);
+	force == 1 || leds.address[index] != color ? (
+		send_command(0x02, 0x10, 0x70 + index, color);
+		leds.address[index] = color;
+	);
+);
+
+function transpose_set(semitones, force)
+(
+	seq_global_set(0x02, semitones, force);
+);
+
+function scale_set(scale, force)
+(
+	seq_global_set(0x03, scale, force);
+);
+
+function mode_set(mode, force)
+(
+	seq_global_set(0x04, mode, force);
+);
+
+function step_size_set(step_size, force)
+(
+	seq_global_set(0x05, step_size, force);
+);
+
+function pattern_length_set(pattern_length, force)
+(
+	seq_global_set(0x06, pattern_length, force);
+);
+
+function swing_set(swing, force)
+(
+	seq_global_set(0x07, swing, force);
+);
+
+function gate_set(gate, force)
+(
+	seq_global_set(0x08, gate, force);
+);
+
+function legato_set(legato, force)
+(
+	seq_global_set(0x09, legato, force);
+);
+
+function update_sequencer_steps(force)
+(
+	step_set( 0, 0x3C + slider(27 + 0) + (slider(43 + 0) - 4) * 10, slider(11 + 0), force);
+	step_set( 1, 0x3C + slider(27 + 1) + (slider(43 + 1) - 4) * 10, slider(11 + 1), force);
+	step_set( 2, 0x3C + slider(27 + 2) + (slider(43 + 2) - 4) * 10, slider(11 + 2), force);
+	step_set( 3, 0x3C + slider(27 + 3) + (slider(43 + 3) - 4) * 10, slider(11 + 3), force);
+	step_set( 4, 0x3C + slider(27 + 4) + (slider(43 + 4) - 4) * 10, slider(11 + 4), force);
+	step_set( 5, 0x3C + slider(27 + 5) + (slider(43 + 5) - 4) * 10, slider(11 + 5), force);
+	step_set( 6, 0x3C + slider(27 + 6) + (slider(43 + 6) - 4) * 10, slider(11 + 6), force);
+	step_set( 7, 0x3C + slider(27 + 7) + (slider(43 + 7) - 4) * 10, slider(11 + 7), force);
+	step_set( 8, 0x3C + slider(27 + 8) + (slider(43 + 8) - 4) * 10, slider(11 + 8), force);
+	step_set( 9, 0x3C + slider(27 + 9) + (slider(43 + 9) - 4) * 10, slider(11 + 9), force);
+	step_set(10, 0x3C + slider(27 + 10) + (slider(43 + 10) - 4) * 10, slider(11 + 10), force);
+	step_set(11, 0x3C + slider(27 + 11) + (slider(43 + 11) - 4) * 10, slider(11 + 11), force);
+	step_set(12, 0x3C + slider(27 + 12) + (slider(43 + 12) - 4) * 10, slider(11 + 12), force);
+	step_set(13, 0x3C + slider(27 + 13) + (slider(43 + 13) - 4) * 10, slider(11 + 13), force);
+	step_set(14, 0x3C + slider(27 + 14) + (slider(43 + 14) - 4) * 10, slider(11 + 14), force);
+	step_set(15, 0x3C + slider(27 + 15) + (slider(43 + 15) - 4) * 10, slider(11 + 15), force);
+	step_set(16, 0x3C + slider(27 + 16) + (slider(43 + 16) - 4) * 10, slider(11 + 16), force);
+);
+
+function update_seq(force, octaves, semitones, scale, mode, step_size, pattern_length, swing, gate, legato)
+(
+	transp = note + ((octaves - 4) * 12) + semitones;
+	pattern_length += 1;
+	transpose_set(transp, force);
+	scale_set(scale, force);
+	mode_set(mode, force);
+	step_size_set(step_size, force);
+	pattern_length_set(pattern_length, force);
+	swing_set(swing, force);
+	gate_set(gate, force);
+	legato_set(legato, force);
+	update_sequencer_steps(force);
+);
+update_seq(1, slider2, slider3, slider1, slider6, slider4, slider5, slider9, slider8, slider7);
+
+/*||||||||||||||||||||||||||||||||||||||*/
+
+@block
+/*||||||||||||||||||||||||||||||||||||||*/
+while (midirecv(ts, msg1, msg23)) (
+	m = msg1 & 240;
+	m == 0x90 ? (
+		vel = (msg23 / 256) | 0;
+		note = msg23 & 127;
+		vel = min(max(vel, 0), 127);
+		midisend(ts, 0xB0 + slider60, 7 | (vel << 8));
+	) : (
+	m != 0x80 ? (
+		midisend(ts, m + slider60, msg23);
+	);
+);
+);
+update_seq(0, slider2, slider3, slider1, slider6, slider4, slider5, slider9, slider8, slider7);
+
+/*||||||||||||||||||||||||||||||||||||||*/
+
+@gfx 580 375
+/*||||||||||||||||||||||||||||||||||||||*/
+gfx_w < 580 ? gfx_w = 580;
+gfx_h < 375 ? gfx_h = 375;
+ui.layout_grid(0, 0, gfx_w, gfx_h, 1, 1);
+ui.layout_grid_background();
+ui.layout_subgrid(8, 15);
+ui.layout_title("Steps", 	0, 0, 8, 1);
+ui.layout_combobutton(5, "Length", 16, 	6, 0, 2, 1);
+slider5 >= 7 ? (
+	ui.layout_ledtoggle_square(18, "8", 	7, 1, 1, 2);
+	ui.layout_combolabel(34, "Note 8", 12, 	7, 3, 1, 1);
+	ui.layout_combolabel(50, "Octave 8", 9, 	7, 4, 1, 1);
+);
+slider5 >= 6 ? (
+	ui.layout_ledtoggle_square(17, "7", 	6, 1, 1, 2);
+	ui.layout_combolabel(33, "Note 7", 12, 	6, 3, 1, 1);
+	ui.layout_combolabel(49, "Octave 7", 9, 	6, 4, 1, 1);
+);
+slider5 >= 5 ? (
+	ui.layout_ledtoggle_square(16, "6", 	5, 1, 1, 2);
+	ui.layout_combolabel(32, "Note 6", 12, 	5, 3, 1, 1);
+	ui.layout_combolabel(48, "Octave 6", 9, 	5, 4, 1, 1);
+);
+slider5 >= 4 ? (
+	ui.layout_ledtoggle_square(15, "5", 	4, 1, 1, 2);
+	ui.layout_combolabel(31, "Note 5", 12, 	4, 3, 1, 1);
+	ui.layout_combolabel(47, "Octave 5", 9, 	4, 4, 1, 1);
+);
+slider5 >= 3 ? (
+	ui.layout_ledtoggle_square(14, "4", 	3, 1, 1, 2);
+	ui.layout_combolabel(30, "Note 4", 12, 	3, 3, 1, 1);
+	ui.layout_combolabel(46, "Octave 4", 9, 	3, 4, 1, 1);
+);
+slider5 >= 2 ? (
+	ui.layout_ledtoggle_square(13, "3", 	2, 1, 1, 2);
+	ui.layout_combolabel(29, "Note 3", 12, 	2, 3, 1, 1);
+	ui.layout_combolabel(45, "Octave 3", 9, 	2, 4, 1, 1);
+);
+slider5 >= 1 ? (
+	ui.layout_ledtoggle_square(12, "2", 	1, 1, 1, 2);
+	ui.layout_combolabel(28, "Note 2", 12, 	1, 3, 1, 1);
+	ui.layout_combolabel(44, "Octave 2", 9, 	1, 4, 1, 1);
+);
+slider5 >= 0 ? (
+	ui.layout_ledtoggle_square(11, "1", 	0, 1, 1, 2);
+	ui.layout_combolabel(27, "Note 1", 12, 	0, 3, 1, 1);
+	ui.layout_combolabel(43, "Octave 1", 9, 	0, 4, 1, 1);
+);
+slider5 >= 15 ? (
+	ui.layout_ledtoggle_square(26, "16", 	7, 5, 1, 2);
+	ui.layout_combolabel(42, "Note 16", 12, 	7, 7, 1, 1);
+	ui.layout_combolabel(58, "Octave 16", 9, 	7, 8, 1, 1);
+);
+slider5 >= 14 ? (
+	ui.layout_ledtoggle_square(25, "15", 	6, 5, 1, 2);
+	ui.layout_combolabel(41, "Note 15", 12, 	6, 7, 1, 1);
+	ui.layout_combolabel(57, "Octave 15", 9, 	6, 8, 1, 1);
+);
+slider5 >= 13 ? (
+	ui.layout_ledtoggle_square(24, "14", 	5, 5, 1, 2);
+	ui.layout_combolabel(40, "Note 14", 12, 	5, 7, 1, 1);
+	ui.layout_combolabel(56, "Octave 14", 9, 	5, 8, 1, 1);
+);
+slider5 >= 12 ? (
+	ui.layout_ledtoggle_square(23, "13", 	4, 5, 1, 2);
+	ui.layout_combolabel(39, "Note 13", 12, 	4, 7, 1, 1);
+	ui.layout_combolabel(55, "Octave 13", 9, 	4, 8, 1, 1);
+);
+slider5 >= 11 ? (
+	ui.layout_ledtoggle_square(22, "12", 	3, 5, 1, 2);
+	ui.layout_combolabel(38, "Note 12", 12, 	3, 7, 1, 1);
+	ui.layout_combolabel(54, "Octave 12", 9, 	3, 8, 1, 1);
+);
+slider5 >= 10 ? (
+	ui.layout_ledtoggle_square(21, "11", 	2, 5, 1, 2);
+	ui.layout_combolabel(37, "Note 11", 12, 	2, 7, 1, 1);
+	ui.layout_combolabel(53, "Octave 11", 9, 	2, 8, 1, 1);
+);
+slider5 >= 9 ? (
+	ui.layout_ledtoggle_square(20, "10", 	1, 5, 1, 2);
+	ui.layout_combolabel(36, "Note 10", 12, 	1, 7, 1, 1);
+	ui.layout_combolabel(52, "Octave 10", 9, 	1, 8, 1, 1);
+);
+slider5 >= 8 ? (
+	ui.layout_ledtoggle_square(19, "9", 	0, 5, 1, 2);
+	ui.layout_combolabel(35, "Note 9", 12, 	0, 7, 1, 1);
+	ui.layout_combolabel(51, "Octave 9", 9, 	0, 8, 1, 1);
+);
+ui.layout_title("Settings", 	0, 9, 8, 1);
+ui.layout_label("Scale", 	0, 10, 2, 1, 1); ui.layout_combobutton(1, "Scale", 8, 	2, 10, 2, 1);
+ui.layout_label("Mode", 	0, 11, 2, 1, 1); ui.layout_combobutton(6, "Mode", 4, 	2, 11, 2, 1);
+ui.layout_label("Step Size", 	0, 12, 2, 1, 1); ui.layout_combobutton(4, "Step Size", 4, 	2, 12, 2, 1);
+ui.layout_label("Legato", 	0, 13, 2, 1, 1); ui.layout_combobutton(7, "Legato", 2, 	2, 13, 2, 1);
+ui.layout_label("Channel", 	0, 14, 2, 1, 1); ui.layout_combobutton(60, "MIDI Channel", 16, 	2, 14, 2, 1);
+ui.layout_combobutton(2, "Octave", 9, 	4, 10, 2, 1);  ui.layout_label("Octaves", 	6, 10, 2, 1, 1);
+ui.layout_combobutton(3, "Semitones", 12, 	4, 11, 2, 1);  ui.layout_label("Semitones", 	6, 11, 2, 1, 1);
+ui.layout_slider(9, 0, 100, 62, 1, 10, "Swing", 100, 0, "%", 	4, 12, 2, 1);  ui.layout_label("Swing", 	6, 12, 2, 1, 1);
+slider7 == 0 ? (
+	ui.layout_slider(8, 0, 100, 91, 1, 10, "Gate", 100, 0, "%", 	4, 13, 2, 1);  ui.layout_label("Gate", 	6, 13, 2, 1, 1);
+);
+ui.layout_frame();
+mouse_wheel = 0;
