@@ -1,0 +1,806 @@
+desc:SonicGoniometer v1.0.0 (NovaSonica)
+in_pin:Left
+in_pin:Right
+out_pin:Left
+out_pin:Right
+
+/*||||||||||||||||||||||||||||||||||||||*/
+
+@init
+/*||||||||||||||||||||||||||||||||||||||*/
+GUI_RENDER_GRID_BACKGROUND = 1;
+GUI_RENDER_SUBGRID_BACKGROUND = 1;
+GUI_RENDER_FRAME = 1;
+GUI_RENDER_COMPONENTS = 1;
+GUI_RENDER_DEBUG_BORDERS = 0;
+THEME_COLORS_SHIFT_HOVER_HUE = 40;
+THEME_COLORS_SHIFT_FOREGROUND_HUE = 90;
+THEME_COLORS_SHIFT_LABEL_HUE = -70;
+THEME_COLORS_SHIFT_DISPLAY_HUE = -20;
+THEME_COLORS_MAIN_HUE = 268;
+THEME_COLORS_MAIN_SAT = 0.42;
+THEME_COLORS_MAIN_LUM = 0.24;
+THEME_COLORS_SUB_HUE = 269;
+THEME_COLORS_SUB_SAT = 0.38;
+THEME_COLORS_SUB_SAT_DIM = THEME_COLORS_SUB_SAT * 0.90;
+THEME_COLORS_SUB_LUM = 0.26;
+THEME_COLORS_SUB_LUM_DIM = THEME_COLORS_SUB_LUM * 0.90;
+THEME_COLORS_SUB_HUE_FG = THEME_COLORS_MAIN_HUE + THEME_COLORS_SHIFT_FOREGROUND_HUE;
+THEME_COLORS_SUB_HUE_HOVER = THEME_COLORS_SUB_HUE + THEME_COLORS_SHIFT_FOREGROUND_HUE;
+THEME_COLORS_SUB_HUE_LABEL = THEME_COLORS_SUB_HUE + THEME_COLORS_SHIFT_LABEL_HUE;
+THEME_COLORS_DISPLAY_HUE = THEME_COLORS_SUB_HUE + THEME_COLORS_SHIFT_DISPLAY_HUE;
+THEME_COLORS_DISPLAY_SAT = 0.5;
+THEME_COLORS_DISPLAY_LUM = 0.5;
+THEME_PADDING_MAIN_LEFT = 3;
+THEME_PADDING_MAIN_RIGHT = 3;
+THEME_PADDING_MAIN_TOP = 3;
+THEME_PADDING_MAIN_BOTTOM = 3;
+THEME_PADDING_SUB = 3;
+THEME_FRAME_LEFT = 2;
+THEME_FRAME_RIGHT = 2;
+THEME_FRAME_TOP = 2;
+THEME_FRAME_BOTTOM = 2;
+BUFFERS_MAX = 100;
+GFX_BUFFERS_MAX = 1000;
+GFX_BUFFER_SIZE = 11;
+UI_BUFFER_SIZE = 25;
+GONIOMETER_BUFFER_SIZE = 2048;
+UI_BUFFER_ADDR_BASE = 16384*10;
+UI_BUFFER_ADDR_MAIN = UI_BUFFER_ADDR_BASE;
+UI_BUFFER_ADDR_SUB = UI_BUFFER_ADDR_BASE + UI_BUFFER_SIZE;
+GFX_BUFFER_ADDR_BASE = UI_BUFFER_ADDR_BASE + UI_BUFFER_SIZE * 4;
+GFX_OFF_SCREEN_ADDR_BASE = GFX_BUFFER_ADDR_BASE + GFX_BUFFERS_MAX * GFX_BUFFER_SIZE;
+GONIOMETER_BUFFER_ADDR_BASE = GFX_OFF_SCREEN_ADDR_BASE + GFX_BUFFERS_MAX * GFX_BUFFER_SIZE;
+GONIOMETER_BUFFER_ADDR_X = GONIOMETER_BUFFER_ADDR_BASE;
+GONIOMETER_BUFFER_ADDR_Y = GONIOMETER_BUFFER_ADDR_X + GONIOMETER_BUFFER_SIZE * 2 + 2;
+BUFFER_ADDR_BASE = GONIOMETER_BUFFER_ADDR_Y + GONIOMETER_BUFFER_SIZE * 2 + 2;
+BUFFER_ADDR_HEADERS = BUFFER_ADDR_BASE;
+BUFFER_ADDR_ADDRESSES = BUFFER_ADDR_BASE + BUFFERS_MAX;
+BUFFER_ADDR_DATA = BUFFER_ADDR_BASE + BUFFERS_MAX * 2;
+
+function status()
+(
+	this.status_last = 0;
+	this.status_changed = 0;
+	this.samples_played = 0;
+);
+
+function status_is_playing()
+(
+	play_state == 1 || play_state == 5;
+);
+ST.status();
+PI = $pi;
+TWO_PI = $pi*2;
+FOUR_PI = $pi*4;
+TENTH_PI = $pi/10;
+COS_OF_ONE = cos(1);
+SIN_OF_ONE = sin(1);
+TWELFTH_ROOT_OF_TWO = 2^(1/12);
+TUNING = 440;
+phi = 1.6803398875;
+phi2 = 1.6803398875+1.6803398875;
+phi4 = phi2+phi2;
+half_pi = $pi/2;
+one_and_a_half_pi = $pi*1.5;
+pi2 = 2 * $pi;
+
+function fmod(x y)
+local(xy)
+(
+	xy = x/y;
+	abs(floor(xy) - xy)*2;
+);
+
+function round(val)
+(
+	floor(val + 0.5);
+);
+
+function round(val stepsize)
+(
+	round(val/stepsize)*stepsize;
+);
+
+function snapNormalizedToEdge(val snapDistance)
+local(minSnap maxSnap)
+(
+	minSnap = snapDistance;
+	maxSnap = 1 - snapDistance;
+	val <= minSnap ? ( val = 0; );
+	val >= maxSnap ? ( val = 1; );
+	val;
+);
+
+function snapXToPixels(x)
+(
+	x|0 + snapNormalizedToEdge(x-floor(x), 0.02);
+);
+
+function snapYToPixels(y)
+(
+	y|0 + snapNormalizedToEdge(y-floor(y), 0.02);
+);
+
+function snapWidthToPixels(w)
+(
+	w|0 + snapNormalizedToEdge(w-floor(w), 0.02);
+);
+
+function snapHeightToPixels(h)
+(
+	h|0 + snapNormalizedToEdge(h-floor(h), 0.02) + 1;
+);
+
+function goniometer()
+(
+	this.xPos = GONIOMETER_BUFFER_ADDR_X;
+	this.yPos = GONIOMETER_BUFFER_ADDR_Y;
+	this.rot = -$pi/4;
+	this.samples = GONIOMETER_BUFFER_SIZE;
+	this.refresh_rate = srate/8;
+	this.n = 0;
+	this.phC = 0;
+	this.ph = 0;
+);
+
+function goniometer_normalize_samples()
+(
+	this.i = min(this.b, this.samples);
+	this.spl_min = 0;
+	this.spl_max = 0;
+	loop (this.i,
+		this.spl_x = this.xPos[this.i];
+		this.spl_y = this.yPos[this.i];
+		this.spl_min = min(this.spl_min, min(this.spl_x, this.spl_y));
+		this.spl_max = max(this.spl_max, max(this.spl_x, this.spl_y));
+		this.i -= 1;
+	);
+	this.spl_normalized = max(abs(this.spl_min), this.spl_max)*2;
+);
+
+function goniometer_sample()
+(
+	this.spl_0 = sign(spl0);
+	this.spl_1 = sign(spl1);
+	this.angle = atan(spl0/spl1);
+	this.a = abs(this.angle);
+	this.in_phase = this.a >= 1.570796 ? 1 : (this.a <= 0.0001 ? 0 : -1);
+	(
+		(this.spl_0 == 1 && this.spl_1 == -1) ||
+		(this.spl_0 == -1 && this.spl_1 == -1)
+	) ?
+	(
+		this.angle += $pi;
+	);
+	(this.spl_0 == -1 && this.spl_1 == 1) ?
+	(
+		this.angle += $pi*2;
+	);
+	(spl1 == 0) ? ((spl0 > 0) ? ( this.angle = $pi/2; ) : ( this.angle = $pi*1.5; ); );
+	(spl0 == 0) ? ((spl1 > 0) ? ( this.angle = 0; ) : ( this.angle = $pi; ); );
+	this.radius = sqrt(sqr(spl0)+sqr(spl1));
+	this.angle -= this.rot;
+	this.xPos[this.b] = cos(this.angle)*this.radius;
+	this.yPos[this.b] = sin(this.angle)*this.radius;
+	(this.b < this.samples) ? ( this.b += 1; );
+	(this.spl_0 != this.spl_1) ? ( this.phC -= 1; ) : ( this.phC += 1; );
+	this.n += 1;
+	(this.n > this.refresh_rate) ?
+	(
+		this.correlation = this.phC / this.n;
+		this.ph = (1-this.correlation)/2;
+		this.phC = this.n = 0;
+	);
+);
+
+function goniometer_x(i)
+(
+	this.xPos[i];
+);
+
+function goniometer_y(i)
+(
+	this.yPos[i];
+);
+GM.goniometer();
+
+function mouseInArea(x y w h)
+(
+	mouse_y >= y && mouse_y <= (y+h) && (mouse_x >= x && mouse_x <= (x+w));
+);
+
+function hsla(h s l a)
+local(m c x r g b quadrant)
+(
+	h < 0 ?
+	(
+		h = h + ceil(-h / 360) * 360;
+	) :
+	(
+		h > 360 ?
+		(
+			h = h - floor(h / 360) * 360;
+		);
+	);
+	h == 0 ? h = 360;
+	m = l - (c / 2);
+	c = (1 - abs(2 * s - 1)) * s;
+	x = c * (1 - abs(fmod((h / 60), 2) - 1));
+	r = 0; g = 0; b = 0;
+	quadrant = ceil(h / 60);
+	quadrant == 1 ? ( r = c; g = x; b = 0; );
+	quadrant == 2 ? ( r = x; g = c; b = 0; );
+	quadrant == 3 ? ( r = 0; g = c; b = x; );
+	quadrant == 4 ? ( r = 0; g = x; b = c; );
+	quadrant == 5 ? ( r = x; g = 0; b = c; );
+	quadrant == 6 ? ( r = c; g = 0; b = x; );
+	gfx_r = r + m;
+	gfx_g = g + m;
+	gfx_b = b + m;
+	gfx_a = a;
+);
+
+function blurArea(x y w h n)
+(
+	loop(n,
+		gfx_x = x;
+		gfx_y = y;
+		gfx_blurto(gfx_x+w, gfx_y+h);
+	);
+);
+
+function drawString(x y str)
+(
+	gfx_x = x;
+	gfx_y = y;
+	gfx_drawstr(str);
+);
+
+function drawStringOutlined(x y str hue sat lum a)
+(
+	hsla(hue,0,0.01,a/2);
+	drawString(x-1, y, str);
+	drawString(x+1, y, str);
+	drawString(x, y-1, str);
+	drawString(x, y+1, str);
+	drawString(x-1, y-1, str);
+	drawString(x+1, y-1, str);
+	drawString(x-1, y+1, str);
+	drawString(x+1, y+1, str);
+	hsla(hue,sat,lum,a);
+	drawString(x, y, str);
+);
+
+function drawStringOutlined(x y str)
+(
+	drawStringOutlined(x, y, str, 0, 1, 1, 1);
+);
+
+function showToolTip(x y w h str)
+local(strW strH bx by bw bh)
+(
+	mouse_y >= y && mouse_y <= (y+h) && (mouse_x >= x && mouse_x <= (x+w)) ?
+	(
+		strW = 0;
+		strH = 0;
+		gfx_measurestr(str, strW, strH);
+		bx = mouse_x + 10;
+		by = mouse_y - strH - 15;
+		bw = strW + 5;
+		bh = strH + 5;
+		bx < x ? bx = x;
+		by < y ? by = y;
+		bx + bw >= x+w ? bx = x+w-bw;
+		by + bh >= y+h ? by = y+h-bh;
+		blurArea(bx, by, bw, bh, 16);
+		gfx_r = 0; gfx_g = 0; gfx_b = 0; gfx_a = 0.5;
+		gfx_rect(bx, by, bw, bh);
+		gfx_r = 1; gfx_g = 1; gfx_b = 1; gfx_a = 1;
+		gfx_rect(bx-1, by-1, bw+2, bh+2, -1);
+		drawString(bx+2.5, by+2.5, str);
+	);
+);
+
+function gfx_start(bufID)
+local(gfx_last_buffer)
+(
+	gfx_last_buffer = gfx_dest;
+	gfx_dest = bufID;
+	gfx_w_local = 0;
+	gfx_h_local = 0;
+	gfx_getimgdim(bufID, gfx_w_local, gfx_h_local);
+);
+
+function gfx_end()
+(
+	gfx_dest = gfx_last_buffer;
+);
+
+function blit_prepare_display(hue sat lum alpha)
+local(last_h last_s last_l last_a)
+(
+	last_h != hue || last_s != sat || last_l != lum || last_a != alpha ?
+	(
+		gfx_dest = 50;
+		gfx_setimgdim(50, 2, 2);
+		gfx_r = gfx_g = gfx_b = 0; gfx_a = 1;
+		gfx_rect(0, 0, 2, 2);
+		hsla(hue, sat, lum, alpha);
+		gfx_x = 0; gfx_y = 0;
+		gfx_setpixel(gfx_r, gfx_g, gfx_b);
+		hsla(hue, sat, lum*0.5, alpha);
+		gfx_x = 1; gfx_y = 1;
+		gfx_setpixel(gfx_r, gfx_g, gfx_b);
+		hsla(hue, sat, lum*(2/3), alpha);
+		gfx_x = 1; gfx_y = 0;
+		gfx_setpixel(gfx_r, gfx_g, gfx_b);
+		gfx_x = 0; gfx_y = 1;
+		gfx_setpixel(gfx_r, gfx_g, gfx_b);
+		gfx_dest = -1;
+		last_h = hue;
+		last_s = sat;
+		last_l = lum;
+		last_a = alpha;
+	);
+);
+
+function blit_tiled_display(x y w h hue sat lum alpha)
+local(coordinatelist l m xpos ypos last_x last_y last_w last_h)
+(
+	last_x != x || last_y != y || last_w != w || last_h != h ?
+	(
+		blit_prepare_display(hue, sat, lum, alpha);
+		x = ceil(x);
+		y = ceil(y);
+		coordinatelist=GFX_BUFFER_ADDR_BASE;
+		coordinatelist[0]=0;
+		coordinatelist[1]=0;
+		coordinatelist[2]=2;
+		coordinatelist[3]=2;
+		coordinatelist[6]=2;
+		coordinatelist[7]=2;
+		coordinatelist[8]=0;
+		coordinatelist[9]=0;
+		l = floor(w);
+		m = floor(h);
+		i = 0;
+		__n_i = ceil((l-0)/2);
+		loop (__n_i,
+			j = 0;
+			__n_j = ceil((m-0)/2);
+			loop (__n_j,
+				xpos = x+i;
+				ypos = y+j;
+				coordinatelist[4]= xpos - xpos % 2;
+				coordinatelist[5]= ypos - ypos % 2;
+				gfx_blitext(50, coordinatelist, 0);
+				j += 2;
+			);
+			i += 2;
+		);
+		last_x = x;
+		last_y = y;
+		last_w = w;
+		last_h = h;
+	);
+);
+
+function blit_tiled_display(x y w h)
+(
+	blit_tiled_display(x, y, w, h, 230, 0.5, 0.5, 1.0);
+);
+
+function blitOffScreen(idSrc idDest src_x src_y src_w src_h dest_x dest_y dest_w dest_h)
+local(gfx_last_buffer coordinatelist)
+(
+	gfx_last_buffer = gfx_dest;
+	gfx_dest = idDest;
+	gfx_w_local = 0;
+	gfx_h_local = 0;
+	gfx_getimgdim(idDest, gfx_w_local, gfx_h_local);
+	gfx_w_local != src_w || gfx_h_local != src_h ? gfx_setimgdim(idDest, src_w, src_h);
+	coordinatelist=GFX_BUFFER_ADDR_BASE+(idSrc+2)*GFX_BUFFER_SIZE;
+	coordinatelist[0]=src_x|0;
+	coordinatelist[1]=src_y|0;
+	coordinatelist[2]=src_w|0;
+	coordinatelist[3]=src_h|0;
+	coordinatelist[4]=dest_x|0;
+	coordinatelist[5]=dest_y|0;
+	coordinatelist[6]=dest_w|0;
+	coordinatelist[7]=dest_h|0;
+	coordinatelist[8]=0;
+	coordinatelist[9]=0;
+	gfx_blitext(idSrc, coordinatelist, 0);
+	gfx_dest = gfx_last_buffer;
+);
+
+function storeGfxBuffer(idDest src_x src_y src_w src_h)
+(
+	gfx_a_old = gfx_a;
+	gfx_a = 1;
+	blitOffScreen(-1, idDest, src_x, src_y, src_w, src_h, 0, 0, src_w, src_h);
+	gfx_a = gfx_a_old;
+);
+
+function restoreGfxBuffer(idSrc src_x src_y src_w src_h)
+(
+	gfx_a_old = gfx_a;
+	gfx_a = 1;
+	blitOffScreen(idSrc, -1, 0, 0, src_w, src_h, src_x, src_y, src_w, src_h);
+	gfx_a = gfx_a_old;
+);
+
+function gfx_init_buffer(id w h)
+(
+	gfx_start(id);
+	gfx_setimgdim(id, w, h);
+	blit_tiled_display(0,0,w,h);
+	gfx_end();
+);
+
+function blit_border(ix iy iw ih)
+(
+	gfx_r = 1; gfx_g = 0; gfx_b = 0; gfx_a = 0.125;
+	gfx_rect(ix, iy, iw, ih, 0);
+	gfx_r = 1; gfx_g = 1; gfx_b = 1; gfx_a = 0.5;
+	gfx_rect(ix, iy, iw, ih, 0);
+	gfx_r = 0; gfx_g = 0; gfx_b = 0; gfx_a = 1;
+	gfx_rect(ix-1, iy-1, iw+2, ih+2, 0);
+);
+
+function blit_border(ix iy iw ih hue sat lum)
+(
+	hsla(hue,0,0,0.125);
+	gfx_rect(ix, iy, iw, ih, 0);
+	hsla(hue,sat,lum,1);
+	gfx_rect(ix, iy, iw, ih, 0);
+	hsla(hue,sat,lum/8,1);
+	gfx_rect(ix-1, iy-1, iw+2, ih+2, 0);
+);
+
+function blit_debug_border(ix iy iw ih hue thicknessLeft thicknessRight thicknessTop thicknessBottom)
+(
+	GUI_RENDER_DEBUG_BORDERS == 1 ? (
+		hsla(hue,0.5,0.5,1);
+		gfx_rect(ix, iy, iw, thicknessTop);
+		gfx_rect(ix, iy + ih - thicknessBottom, iw, thicknessBottom);
+		gfx_rect(ix, iy, thicknessLeft, ih);
+		gfx_rect(ix + iw - thicknessRight, iy, thicknessRight, ih);
+	);
+);
+
+function blit_debug_border(ix iy iw ih hue thickness)
+(
+	blit_debug_border(ix, iy, iw, ih, hue, thickness, thickness, thickness, thickness);
+);
+
+function layout()
+(
+	this.address = UI_BUFFER_ADDR_BASE;
+	this.main = UI_BUFFER_ADDR_MAIN;
+	this.sub = UI_BUFFER_ADDR_SUB;
+	this.status.status();
+);
+
+function layout_pixelAdd(x y r g b)
+(
+	(w != 0 && h != 0) ?
+	(
+		gfx_x = x;
+		gfx_y = y;
+		gfx_getpixel(rpx, gpx, bpx);
+		gfx_setpixel(rpx+r, gpx+g, bpx+b);
+	);
+);
+
+function layout_subgrid_select(c r col_span row_span)
+local(x y w h bx by bw bh)
+(
+	x = this.main_x + THEME_PADDING_MAIN_LEFT;
+	y = this.main_y + THEME_PADDING_MAIN_TOP;
+	w = this.main_w - THEME_PADDING_MAIN_LEFT - THEME_PADDING_MAIN_RIGHT;
+	h = this.main_h - THEME_PADDING_MAIN_TOP - THEME_PADDING_MAIN_BOTTOM;
+	bx = (w / this.sub_cols) * c;
+	by = (h / this.sub_rows) * r;
+	bw = w / this.sub_cols;
+	bh = h / this.sub_rows;
+	(col_span > 1) ? bw *= col_span;
+	(row_span > 1) ? bh *= row_span;
+	bx += THEME_PADDING_SUB / 2;
+	bw -= THEME_PADDING_SUB;
+	by += THEME_PADDING_SUB / 2;
+	bh -= THEME_PADDING_SUB;
+	bx += x;
+	by += y;
+	this.sub.selection.x = snapXToPixels(bx);
+	this.sub.selection.y = snapYToPixels(by);
+	this.sub.selection.h = snapWidthToPixels(bh);
+	this.sub.selection.w = snapHeightToPixels(bw);
+	blit_debug_border(
+		bx,by,bw,bh,
+		30+(r+c)*2,
+		2
+	);
+);
+
+function layout_grid_select(c r cols rows)
+(
+	this.main.selection.w = snapXToPixels(this.main_w - THEME_PADDING_MAIN_LEFT - THEME_PADDING_MAIN_RIGHT);
+	this.main.selection.h = snapYToPixels(this.main_h - THEME_PADDING_MAIN_TOP - THEME_PADDING_MAIN_BOTTOM);
+	this.main.selection.x = snapWidthToPixels((this.main.selection.w / this.main_cols) * c + THEME_PADDING_MAIN_LEFT);
+	this.main.selection.y = snapHeightToPixels((this.main.selection.h / this.main_crows) * r + THEME_PADDING_MAIN_TOP);
+);
+
+function layout_grid(x y w h cols rows)
+(
+	this.main = this.address;
+	this.main_subgrids = 0;
+	this.main_x = x;
+	this.main_y = y;
+	this.main_w = w;
+	this.main_h = h;
+	this.main_cols = cols;
+	this.main_rows = rows;
+	this.layout_grid_select(0, 0, cols, rows);
+);
+
+function layout_subgrid(s_cols s_rows)
+(
+	this.sub = this.address + 25 + this.main_subgrids * 25;
+	this.main_subgrids += 1;
+	this.sub_cols = s_cols;
+	this.sub_rows = s_rows;
+	this.layout_subgrid_select(0, 0, s_cols, s_rows);
+);
+
+function layout_hover()
+(
+	mouseInArea(this.sub.selection.x, this.sub.selection.y, this.sub.selection.w, this.sub.selection.h);
+);
+
+function layout_hover(sub_x sub_y div_x div_y)
+(
+	mouseInArea(ceil(this.sub.selection.x+sub_x*floor(this.sub.selection.w/div_x))+1,
+	ceil(this.sub.selection.y+sub_y*floor(this.sub.selection.h/div_y))+1,
+	floor(this.sub.selection.w/div_x)-2, floor(this.sub.selection.h/div_y)-2);
+);
+
+function layout_grid_background()
+(
+	GUI_RENDER_GRID_BACKGROUND == 1 ?
+	(
+		gfx_a = 1;
+		blit_tiled_display(this.main_x, this.main_y, this.main_w, this.main_h, THEME_COLORS_MAIN_HUE, THEME_COLORS_MAIN_SAT, THEME_COLORS_MAIN_LUM, 1);
+	);
+);
+
+function layout_subgrid_background()
+(
+	GUI_RENDER_SUBGRID_BACKGROUND == 1 ?
+	(
+		gfx_a = 1;
+		blit_tiled_display(this.sub.selection.x, this.sub.selection.y, this.sub.selection.w, this.sub.selection.h, THEME_COLORS_DISPLAY_HUE, THEME_COLORS_SUB_SAT, THEME_COLORS_SUB_LUM, 1);
+	);
+);
+
+function layout_goniometer(c, r, cols, rows)
+(
+	this.layout_subgrid_select(c, r, cols, rows);
+	this.layout_subgrid_background();
+	GUI_RENDER_COMPONENTS == 1 ?
+	(
+		ix = this.sub.selection.x;
+		iy = this.sub.selection.y;
+		iw = this.sub.selection.w;
+		ih = this.sub.selection.h;
+		GM.goniometer_normalize_samples();
+		l = min(GM.b, GM.samples);
+		cx = ix + iw/2;
+		cy = iy + ih/2;
+		wn = iw / GM.spl_normalized;
+		hn = ih / GM.spl_normalized;
+		offscreen_bg = 41;
+		this._RESTORE == 0 ? this._RESTORE = GFX_OFF_SCREEN_ADDR_BASE;
+		this._RESTORE[offscreen_bg] == 1 ? restoreGfxBuffer(offscreen_bg, ix, iy, iw, ih);
+		hsla(THEME_COLORS_DISPLAY_HUE, THEME_COLORS_SUB_SAT_DIM, THEME_COLORS_SUB_LUM_DIM, 0.15);
+		gfx_rect(ix, iy, iw, ih, 0.6);
+		blurArea(ix, iy, iw, ih, 4);
+		ST.status_is_playing() ?
+		(
+			hsla(90-90*GM.ph, 0.5, 0.25+0.25*(1-GM.ph), 0.85);
+			gr = gfx_r;
+			gb = gfx_b;
+			gg = gfx_g;
+			hsla(180-180*GM.ph, 0.5, 0.5*(1-GM.ph), 0.25);
+			i = 0;
+			__n_i = ceil((l-0)/1);
+			loop (__n_i,
+				tx = cx + (GM.goniometer_x(i) * wn);
+				ty = cy - (GM.goniometer_y(i) * hn);
+				blurArea(tx-1, ty-1, 2, 2, 2);
+				gfx_a = 0.05;
+				gfx_rect(tx-1, ty-1, 2, 2, 1);
+				gfx_a = 1;
+				this.layout_pixelAdd(tx, ty, gr, gg, gb);
+				i += 1;
+			);
+			storeGfxBuffer(offscreen_bg, ix, iy, iw, ih);
+			this._RESTORE[offscreen_bg] = 1;
+		);
+		GM.b = 0;
+		iw != last_w || ih != last_h ?
+		(
+			gfx_init_buffer(offscreen_bg, iw, ih);
+			gfx_dest = offscreen_bg;
+			blit_tiled_display(ix, iy, iw, ih, THEME_COLORS_DISPLAY_HUE, THEME_COLORS_SUB_SAT_DIM, THEME_COLORS_SUB_LUM_DIM, 1);
+			gfx_dest = -1;
+			GM.goniometer_SIZE = min(iw, ih)-20;
+			GM.goniometer_half_size = GM.goniometer_SIZE/2;
+			GM.goniometer_sizeDSqr05 = GM.goniometer_half_size * 0.70710681;
+			dh = (ih-GM.goniometer_SIZE)/2;
+			dw = (iw-GM.goniometer_SIZE)/2;
+			gs = GM.goniometer_SIZE;
+			gc = GM.goniometer_half_size;
+		);
+		gfx_r = 1; gfx_g = 1; gfx_b = 1; gfx_a = 0.5;
+		x = (ix + iw)|0;
+		x2 = (ix + iw / 2)|0;
+		y = (iy + ih)|0;
+		y2 = (iy + ih / 2)|0;
+		gfx_line(x2, iy, x2, y, 16);
+		gfx_line(ix, iy, x, y, 16);
+		gfx_line(x, iy, ix, y, 16);
+		gfx_line(ix, y2, x, y2, 16);
+		blit_border(ix, iy, iw, ih);
+		label_top_left = "+L";
+		label_top_right = "-R";
+		label_bottom_left = "+R";
+		label_bottom_right = "-L";
+		gfx_measurestr(label_top_left, w, h);
+		drawStringOutlined(ix+10, iy+10, label_top_left);
+		gfx_measurestr(label_top_right, w, h);
+		drawStringOutlined(ix+(iw-10-w), iy+10, label_top_right);
+		gfx_measurestr(label_bottom_left, w, h);
+		drawStringOutlined(ix+10, iy+(ih-10-h), label_bottom_left);
+		gfx_measurestr(label_bottom_right, w, h);
+		drawStringOutlined(ix+(iw-10-w), iy+(ih-10-h), label_bottom_right);
+		this.layout_hover() ?
+		(
+			phase = (GM.ph*10);
+			ptype = #;
+			ptype = (phase >= 9.9) ? "Out Of Phase" : (phase <= 0.1 ? "Mono" : (GM.in_phase != -1) ? (GM.in_phase ? "Left Only" : "Right Only") : "Stereo");
+			str = #;
+			sprintf(str, "%s", ptype);
+			showToolTip(mouse_x, mouse_y-10, 100, 20, str);
+		);
+		last_w = iw;
+		last_h = ih;
+	);
+);
+
+function layout_frame()
+(
+	GUI_RENDER_FRAME == 1 ?
+	(
+		gfx_a = 0.25;
+		gfx_r = 0;
+		gfx_g = 0;
+		gfx_b = 0;
+		gfx_rect(this.main_x, this.main_y, THEME_FRAME_LEFT, this.main_h);
+		gfx_rect(this.main_x + this.main_w - THEME_FRAME_RIGHT, this.main_y, THEME_FRAME_RIGHT, this.main_h);
+		gfx_rect(this.main_x + THEME_FRAME_LEFT, this.main_y, this.main_w - THEME_FRAME_RIGHT - THEME_FRAME_LEFT, THEME_FRAME_TOP);
+		gfx_rect(this.main_x + THEME_FRAME_LEFT, this.main_y + this.main_h - THEME_FRAME_BOTTOM, this.main_w - THEME_FRAME_RIGHT - THEME_FRAME_LEFT, THEME_FRAME_BOTTOM);
+		gfx_a = 1;
+		blit_border(this.main_x+1, this.main_y+1, this.main_w-2, this.main_h-2, THEME_COLORS_MAIN_HUE, THEME_COLORS_MAIN_SAT, THEME_COLORS_MAIN_LUM);
+	);
+);
+ui.layout();
+BUFFERS_MAX = 100;
+GFX_BUFFERS_MAX = 1000;
+GFX_BUFFER_SIZE = 11;
+UI_BUFFER_SIZE = 25;
+GONIOMETER_BUFFER_SIZE = 2048;
+UI_BUFFER_ADDR_BASE = 16384*10;
+UI_BUFFER_ADDR_MAIN = UI_BUFFER_ADDR_BASE;
+UI_BUFFER_ADDR_SUB = UI_BUFFER_ADDR_BASE + UI_BUFFER_SIZE;
+GFX_BUFFER_ADDR_BASE = UI_BUFFER_ADDR_BASE + UI_BUFFER_SIZE * 4;
+GFX_OFF_SCREEN_ADDR_BASE = GFX_BUFFER_ADDR_BASE + GFX_BUFFERS_MAX * GFX_BUFFER_SIZE;
+GONIOMETER_BUFFER_ADDR_BASE = GFX_OFF_SCREEN_ADDR_BASE + GFX_BUFFERS_MAX * GFX_BUFFER_SIZE;
+GONIOMETER_BUFFER_ADDR_X = GONIOMETER_BUFFER_ADDR_BASE;
+GONIOMETER_BUFFER_ADDR_Y = GONIOMETER_BUFFER_ADDR_X + GONIOMETER_BUFFER_SIZE * 2 + 2;
+BUFFER_ADDR_BASE = GONIOMETER_BUFFER_ADDR_Y + GONIOMETER_BUFFER_SIZE * 2 + 2;
+BUFFER_ADDR_HEADERS = BUFFER_ADDR_BASE;
+BUFFER_ADDR_ADDRESSES = BUFFER_ADDR_BASE + BUFFERS_MAX;
+BUFFER_ADDR_DATA = BUFFER_ADDR_BASE + BUFFERS_MAX * 2;
+ST.status();
+
+function buffer_manager()
+(
+	this.header_addresses = BUFFER_ADDR_HEADERS;
+	this.header_lengths = BUFFER_ADDR_ADDRESSES;
+	this.data_start = BUFFER_ADDR_DATA;
+	this.data_size = 0;
+	this.buffers_in_use = -1;
+	this.buffers_max = BUFFERS_MAX;
+);
+
+function buffer_manager_address(id)
+(
+	this.header_addresses[id];
+);
+
+function buffer_manager_length(id)
+(
+	this.header_lengths[id];
+);
+
+function buffer_manager_size()
+local(l)
+(
+	l = this.buffers_in_use-1;
+	this.data_size = 0;
+	while (l >= 0)
+	(
+		this.data_size += this.header_lengths[l];
+		l -= 1;
+	);
+	this.data_size;
+);
+
+function buffer_manager_new(len)
+local(s addr)
+(
+	this.buffers_in_use += 1;
+	s = this.data_start;
+	s += this.buffer_manager_size();
+	this.__calc_addr = s;
+	this.header_lengths[this.buffers_in_use] = len;
+	this.header_addresses[this.buffers_in_use] = s;
+	addr = this.header_addresses[this.buffers_in_use];
+	len -= 1;
+	while (len >= 0)
+	(
+		addr[l] = 0;
+		l -= 1;
+	);
+	this.buffers_in_use;
+);
+BM.buffer_manager();
+
+function buffer(len)
+(
+	this.buffer = BM.buffer_manager_new(len);
+	this.address = BM.buffer_manager_address(this.buffer);
+	this.address_end = BM.buffer_manager_address(this.buffer) + len;
+	this.length = BM.buffer_manager_length(this.buffer);
+	this.length_init = BM.buffer_manager_length(this.buffer);
+	this.index = 0;
+	this.index_reverse = this.length - 1;
+);
+// iir_mag = i1*i1 + i2*i2;
+ext_noinit = 1.0;
+gfx_clear = -1;
+
+/*||||||||||||||||||||||||||||||||||||||*/
+
+@block
+/*||||||||||||||||||||||||||||||||||||||*/
+
+/*||||||||||||||||||||||||||||||||||||||*/
+
+@sample
+/*||||||||||||||||||||||||||||||||||||||*/
+GM.goniometer_sample();
+
+/*||||||||||||||||||||||||||||||||||||||*/
+
+@gfx 50 50
+/*||||||||||||||||||||||||||||||||||||||*/
+gfx_w < 50 ? gfx_w = 50;
+gfx_h < 50 ? gfx_h = 50;
+ui.layout_grid(0, 0, gfx_w, gfx_h, 1, 1);
+ui.layout_grid_background();
+ui.layout_subgrid(1, 1);
+ui.layout_goniometer(	0, 0, 1, 1);
+ui.layout_frame();
